@@ -344,7 +344,7 @@ with open('data/final_users.txt', encoding="utf8") as f:
                         haveLocation = True
                 if haveLocation:
                     if line.startswith("<doc"):
-                        line = line[:-1] + addToXML + ">"
+                        line = line[:-2] + addToXML + ">"
                     outWithLocation.write(line)
                 else:
                     outNoLocation.write(line)
