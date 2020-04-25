@@ -91,7 +91,6 @@ X_validation = sequence.pad_sequences(X_validation, maxlen=max_review_length)
 X_test = sequence.pad_sequences(X_test, maxlen=max_review_length)
 
 with open(filePathMainInfo, "w+") as f:
-    """
     f.write("Max " + str(max_review_length) + " word posts\n")
 
     f.write("\nSimple LSTM\n")
@@ -103,7 +102,6 @@ with open(filePathMainInfo, "w+") as f:
             actual_epochs = lstm.lstm_simple.runTraining(X_train, y_train, X_validation, y_validation, n, 25, save_model_name)
             f.write(resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, X_test, y_test, save_model_name, actual_epochs))
     f.write("\n")
-    """
 
     f.write("\nLSTM Dropout 1\n")
     for n in numNeurons:
