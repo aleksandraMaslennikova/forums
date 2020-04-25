@@ -4,6 +4,12 @@ import numpy
 from keras.engine.saving import load_model
 from keras.preprocessing import sequence
 import lstm.lstm_simple
+import lstm.lstm_dropout_1
+import lstm.lstm_dropout_2
+import lstm.lstm_with_cnn
+import lstm.blstm_simple
+import lstm.blstm_dropout_1
+import lstm.blstm_dropout_2
 import lstm.blstm_with_cnn
 
 
@@ -56,16 +62,16 @@ def resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, X_test
     return result_str
 
 # main variables notation
-max_review_length = 100
+max_review_length = 200
 task = "country_part"
 training_set_percentage = 0.5
 validation_set_percentage = 0.25
-filePathMainInfo = "results_100_words.txt"
+filePathMainInfo = "results_" + str(max_review_length) + "_words.txt"
 numNeurons = [5, 10, 25, 50, 100]
 
 # data preparation
-# download dictionary of 100 word length messages
-with open('data/dict/final_corpus_max_length_100.pickle', 'rb') as handle:
+# download dictionary of 200 word length messages
+with open('data/dict/final_corpus_max_length_' + str(max_review_length) + '.pickle', 'rb') as handle:
     corpus = pickle.load(handle)
 
 training, validation, test = divide_into_training_validation_test(corpus, training_set_percentage, validation_set_percentage)
@@ -85,7 +91,8 @@ X_validation = sequence.pad_sequences(X_validation, maxlen=max_review_length)
 X_test = sequence.pad_sequences(X_test, maxlen=max_review_length)
 
 with open(filePathMainInfo, "w+") as f:
-    f.write("Max 100 word posts\n")
+    """
+    f.write("Max " + str(max_review_length) + " word posts\n")
 
     f.write("\nSimple LSTM\n")
     for n in numNeurons:
@@ -96,6 +103,7 @@ with open(filePathMainInfo, "w+") as f:
             actual_epochs = lstm.lstm_simple.runTraining(X_train, y_train, X_validation, y_validation, n, 25, save_model_name)
             f.write(resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, X_test, y_test, save_model_name, actual_epochs))
     f.write("\n")
+    """
 
     f.write("\nLSTM Dropout 1\n")
     for n in numNeurons:
