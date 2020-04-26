@@ -3,14 +3,14 @@ from random import shuffle
 import numpy
 from keras.engine.saving import load_model
 from keras.preprocessing import sequence
-import lstm.lstm_simple
-import lstm.lstm_dropout_1
-import lstm.lstm_dropout_2
-import lstm.lstm_with_cnn
-import lstm.blstm_simple
-import lstm.blstm_dropout_1
-import lstm.blstm_dropout_2
-import lstm.blstm_with_cnn
+import lstm.classification.lstm_simple
+import lstm.classification.lstm_dropout_1
+import lstm.classification.lstm_dropout_2
+import lstm.classification.lstm_with_cnn
+import blstm.classification.blstm_simple
+import blstm.classification.blstm_dropout_1
+import blstm.classification.blstm_dropout_2
+import blstm.classification.blstm_with_cnn
 
 
 def divide_into_training_validation_test(corpus, training_percentage, validation_percentage):
@@ -99,7 +99,7 @@ with open(filePathMainInfo, "w+") as f:
         f.write("\n\t" + str(n) + " neurons" + "\n")
         for i in range(5):
             save_model_name = save_model_name[:-1] + str(i+1)
-            actual_epochs = lstm.lstm_simple.runTraining(X_train, y_train, X_validation, y_validation, n, 25, save_model_name)
+            actual_epochs = lstm.classification.lstm_simple.runTraining(X_train, y_train, X_validation, y_validation, n, 25, save_model_name)
             f.write(resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, X_test, y_test, save_model_name, actual_epochs))
     f.write("\n")
 
@@ -109,8 +109,8 @@ with open(filePathMainInfo, "w+") as f:
         f.write("\n\t" + str(n) + " neurons" + "\n")
         for i in range(5):
             save_model_name = save_model_name[:-1] + str(i+1)
-            actual_epochs = lstm.lstm_dropout_1.runTraining(X_train, y_train, X_validation,
-                                                            y_validation, n, 25, save_model_name)
+            actual_epochs = lstm.classification.lstm_dropout_1.runTraining(X_train, y_train, X_validation,
+                                                                           y_validation, n, 25, save_model_name)
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, X_test, y_test, save_model_name,
                                         actual_epochs))
@@ -122,8 +122,8 @@ with open(filePathMainInfo, "w+") as f:
         f.write("\n\t" + str(n) + " neurons" + "\n")
         for i in range(5):
             save_model_name = save_model_name[:-1] + str(i+1)
-            actual_epochs = lstm.lstm_dropout_2.runTraining(X_train, y_train, X_validation,
-                                                            y_validation, n, 25, save_model_name)
+            actual_epochs = lstm.classification.lstm_dropout_2.runTraining(X_train, y_train, X_validation,
+                                                                           y_validation, n, 25, save_model_name)
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, X_test, y_test, save_model_name,
                                         actual_epochs))
@@ -135,8 +135,8 @@ with open(filePathMainInfo, "w+") as f:
         f.write("\n\t" + str(n) + " neurons" + "\n")
         for i in range(5):
             save_model_name = save_model_name[:-1] + str(i+1)
-            actual_epochs = lstm.lstm_with_cnn.runTraining(X_train, y_train, X_validation,
-                                                           y_validation, n, 25, save_model_name)
+            actual_epochs = lstm.classification.lstm_with_cnn.runTraining(X_train, y_train, X_validation,
+                                                                          y_validation, n, 25, save_model_name)
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, X_test, y_test, save_model_name,
                                         actual_epochs))
@@ -148,7 +148,7 @@ with open(filePathMainInfo, "w+") as f:
         f.write("\n\t" + str(n) + " neurons" + "\n")
         for i in range(5):
             save_model_name = save_model_name[:-1] + str(i+1)
-            actual_epochs = lstm.blstm_simple.runTraining(X_train, y_train, X_validation,
+            actual_epochs = blstm.classification.blstm_simple.runTraining(X_train, y_train, X_validation,
                                                                                  y_validation, n, 25, save_model_name)
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, X_test, y_test, save_model_name,
@@ -160,8 +160,8 @@ with open(filePathMainInfo, "w+") as f:
         save_model_name = "models/ripartizione_geografica_blstm_dropout_1_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
         for i in range(5):
-            save_model_name= save_model_name[:-1] + str(i+1)
-            actual_epochs = lstm.blstm_dropout_1.runTraining(X_train, y_train, X_validation,
+            save_model_name = save_model_name[:-1] + str(i+1)
+            actual_epochs = blstm.classification.blstm_dropout_1.runTraining(X_train, y_train, X_validation,
                                                                                     y_validation, n, 25,
                                                                                     save_model_name)
             f.write(
@@ -175,7 +175,7 @@ with open(filePathMainInfo, "w+") as f:
         f.write("\n\t" + str(n) + " neurons" + "\n")
         for i in range(5):
             save_model_name = save_model_name[:-1] + str(i+1)
-            actual_epochs = lstm.blstm_dropout_2.runTraining(X_train, y_train, X_validation,
+            actual_epochs = blstm.classification.blstm_dropout_2.runTraining(X_train, y_train, X_validation,
                                                                                     y_validation, n, 25,
                                                                                     save_model_name)
             f.write(
@@ -189,7 +189,7 @@ with open(filePathMainInfo, "w+") as f:
         f.write("\n\t" + str(n) + " neurons" + "\n")
         for i in range(5):
             save_model_name = save_model_name[:-1] + str(i+1)
-            actual_epochs = lstm.blstm_with_cnn.runTraining(X_train, y_train, X_validation,
+            actual_epochs = blstm.classification.blstm_with_cnn.runTraining(X_train, y_train, X_validation,
                                                                                    y_validation, n, 25, save_model_name)
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, X_test, y_test, save_model_name,
