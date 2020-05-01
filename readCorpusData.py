@@ -99,7 +99,7 @@ def readCorpusFromFile(filePath, docMaxLength):
     return corpus_arr
 
 def getWordEmbeddingsItwac(word):
-    conn = sqlite3.connect("D:\\PycharmProjects\\forums_research\\data\\itwac_v2.db")
+    conn = sqlite3.connect("C:\\Users\\User\\PycharmProjects\\forums\\data\\itwac_v2.db")
     cursor = conn.cursor()
     if '"' in word and "'" in word:
         return None
@@ -116,7 +116,7 @@ def getWordEmbeddingsItwac(word):
     return None
 
 def getWordEmbeddingsTwitter(word):
-    conn = sqlite3.connect("D:\\PycharmProjects\\forums_research\\data\\twitter_contesto_tweet.db")
+    conn = sqlite3.connect("C:\\Users\\User\\PycharmProjects\\forums\\data\\twitter_contesto_tweet.db")
     cursor = conn.cursor()
     if '"' in word and "'" in word:
         return None
