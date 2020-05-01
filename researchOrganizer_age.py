@@ -67,6 +67,7 @@ task = "age"
 #numNeurons = [5, 10, 25, 50, 100]
 numNeurons = [100]
 early_stopping_wait = 25
+repeat = 1
 filePathMainInfoTrain = "data/results_age_training_" + str(word_embedding_dict) + "_max_length_" + str(word_embedding_dict)
 filePathMainInfoTest = "data/results_age_test_" + str(word_embedding_dict) + "_max_length_" + str(word_embedding_dict)
 
@@ -98,7 +99,7 @@ with open(filePathMainInfoTrain, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_simple_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = lstm.classification.lstm_simple.runTraining(X_train, y_train, X_validation, y_validation, n, early_stopping_wait, save_model_name)
             f.write(resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name, actual_epochs))
@@ -108,7 +109,7 @@ with open(filePathMainInfoTrain, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_dropout_1_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = lstm.classification.lstm_dropout_1.runTraining(X_train, y_train, X_validation,
                                                                            y_validation, n, early_stopping_wait, save_model_name)
@@ -121,7 +122,7 @@ with open(filePathMainInfoTrain, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_dropout_2_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = lstm.classification.lstm_dropout_2.runTraining(X_train, y_train, X_validation,
                                                                            y_validation, n, early_stopping_wait, save_model_name)
@@ -134,7 +135,7 @@ with open(filePathMainInfoTrain, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_with_cnn_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = lstm.classification.lstm_with_cnn.runTraining(X_train, y_train, X_validation,
                                                                           y_validation, n, early_stopping_wait, save_model_name)
@@ -147,7 +148,7 @@ with open(filePathMainInfoTrain, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_simple_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = blstm.classification.blstm_simple.runTraining(X_train, y_train, X_validation,
                                                                                  y_validation, n, early_stopping_wait, save_model_name)
@@ -160,7 +161,7 @@ with open(filePathMainInfoTrain, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_dropout_1_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = blstm.classification.blstm_dropout_1.runTraining(X_train, y_train, X_validation,
                                                                                     y_validation, n, early_stopping_wait,
@@ -174,7 +175,7 @@ with open(filePathMainInfoTrain, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_dropout_2_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = blstm.classification.blstm_dropout_2.runTraining(X_train, y_train, X_validation,
                                                                                     y_validation, n, early_stopping_wait,
@@ -188,7 +189,7 @@ with open(filePathMainInfoTrain, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_with_cnn_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = blstm.classification.blstm_with_cnn.runTraining(X_train, y_train, X_validation,
                                                                                    y_validation, n, early_stopping_wait, save_model_name)
@@ -222,7 +223,7 @@ with open(filePathMainInfoTest, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_simple_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
@@ -231,7 +232,7 @@ with open(filePathMainInfoTest, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_dropout_1_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
@@ -240,7 +241,7 @@ with open(filePathMainInfoTest, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_dropout_2_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
@@ -249,7 +250,7 @@ with open(filePathMainInfoTest, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_with_cnn_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
@@ -258,7 +259,7 @@ with open(filePathMainInfoTest, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_simple_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
@@ -267,7 +268,7 @@ with open(filePathMainInfoTest, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_dropout_1_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
@@ -276,7 +277,7 @@ with open(filePathMainInfoTest, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_dropout_2_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
@@ -285,7 +286,7 @@ with open(filePathMainInfoTest, "w") as f:
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_with_cnn_neurons_" + str(n) + "_attempt_0"
         f.write("\n\t" + str(n) + " neurons" + "\n")
-        for i in range(5):
+        for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
