@@ -99,7 +99,7 @@ def readCorpusFromFile(filePath, docMaxLength):
     return corpus_arr
 
 def getWordEmbeddingsItwac(word):
-    conn = sqlite3.connect("C:\\Users\\user\\PycharmProjects\\forums_research\\data\\itwac_v2.db")
+    conn = sqlite3.connect("D:\\PycharmProjects\\forums_research\\data\\itwac_v2.db")
     cursor = conn.cursor()
     if '"' in word and "'" in word:
         return None
@@ -115,13 +115,40 @@ def getWordEmbeddingsItwac(word):
         pass
     return None
 
-def transformTextToWordEmbeddings(corpus):
+def getWordEmbeddingsTwitter(word):
+    conn = sqlite3.connect("D:\\PycharmProjects\\forums_research\\data\\twitter_contesto_tweet.db")
+    cursor = conn.cursor()
+    if '"' in word and "'" in word:
+        return None
+    if '"' not in word:
+        cursor.execute('SELECT * FROM store WHERE key="' + word + '"')
+    else:
+        cursor.execute("SELECT * FROM store WHERE key='" + word + "'")
+    results = cursor.fetchall()
+    conn.close()
+    try:
+        return results[0][1:]
+    except:
+        pass
+    return None
+
+def transformTextToWordEmbeddings(corpus, wordembedding_db):
+    num_unknown_words = 0
+    num_known_words = 0
     for i in range(len(corpus)):
         if i % 100 == 0:
             print(str(i) + " messages transformed in Word Embeddings.")
         corpus[i]["word_embedding"] = []
         for j in range(len(corpus[i]["text"])):
-            embedding = getWordEmbeddingsItwac(corpus[i]["text"][j])
+            if wordembedding_db == "itwac":
+                embedding = getWordEmbeddingsItwac(corpus[i]["text"][j])
+            else:
+                embedding = getWordEmbeddingsTwitter(corpus[i]["text"][j])
             if embedding is not None:
                 corpus[i]["word_embedding"].append(embedding)
+                num_known_words += 1
+            else:
+                num_unknown_words += 1
+    print("Незнакомые слова в " + str(wordembedding_db) + ": " + str(num_unknown_words))
+    print("Знакомые слова в " + str(wordembedding_db) + ": " + str(num_known_words))
     return corpus

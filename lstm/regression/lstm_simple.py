@@ -12,7 +12,7 @@ def runTraining(X_train, y_train, X_validation, y_validation, num_neurons_lstm, 
     model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
     es = EarlyStopping(monitor='val_accuracy', mode='max', verbose=1, patience=early_stopping_patience)
     mc = ModelCheckpoint(save_model_name, monitor='val_accuracy', mode='max', save_best_only=True, verbose=1)
-    history = model.fit(X_train, y_train, validation_data=(X_validation, y_validation), epochs=150, batch_size=64, callbacks=[es, mc])
+    history = model.fit(X_train, y_train, validation_data=(X_validation, y_validation), epochs=2500, batch_size=64, callbacks=[es, mc])
     # plot training history
     pyplot.title(save_model_name)
     pyplot.plot(history.history['loss'], label='train')

@@ -3,15 +3,22 @@ import readCorpusData
 
 corpus = {}
 corpus = readCorpusData.readCorpusFromFile("data/final_corpus.txt", 500)
-corpus = readCorpusData.transformTextToWordEmbeddings(corpus)
+corpus = readCorpusData.transformTextToWordEmbeddings(corpus, "itwac")
 
-with open('data/dict/final_corpus_max_length_500.pickle', 'wb') as handle:
+with open('data/dict/final_corpus_itwac_max_length_500.pickle', 'wb') as handle:
     pickle.dump(corpus, handle, protocol=pickle.HIGHEST_PROTOCOL)
-"""
+
+try:
+    del(corpus)
+except Exception as e:
+    print("Not deleted")
+    pass
+print()
+
 corpus = {}
-corpus = readCorpusData.readCorpusFromFile("data/final_corpus.txt", 1000)
-corpus = readCorpusData.transformTextToWordEmbeddings(corpus)
+corpus = readCorpusData.readCorpusFromFile("data/final_corpus.txt", 500)
+corpus = readCorpusData.transformTextToWordEmbeddings(corpus, "twitter")
 
-with open('data/dict/final_corpus_max_length_1000.pickle', 'wb') as handle:
+with open('data/dict/final_corpus_twitter_max_length_500.pickle', 'wb') as handle:
     pickle.dump(corpus, handle, protocol=pickle.HIGHEST_PROTOCOL)
-"""
+
