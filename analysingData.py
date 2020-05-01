@@ -134,11 +134,15 @@ def get_statistics(corpus,category,category_list,thematic):
     return line1 + "\n" + line2 + "\n" + line3 + "\n"
 
 
-def write_statistics_in_file(corpus, fout):
+def write_statistics_in_file(corpus, corpus_part, fout):
     fout.write(get_statistics(corpus, "gender", gender_list, "All"))
+    fout.write(get_statistics(corpus_part, "gender", gender_list, "All"))
     fout.write(get_statistics(corpus, "age", age_list, "All"))
+    fout.write(get_statistics(corpus_part, "age", age_list, "All"))
     fout.write(get_statistics(corpus, "country_part", country_part_list, "All"))
+    fout.write(get_statistics(corpus_part, "country_part", country_part_list, "All"))
     fout.write(get_statistics(corpus, "region", region_list, "All"))
+    fout.write(get_statistics(corpus_part, "region", region_list, "All"))
 
 
 corpus = readCorpusData.readCorpusFromFile("data/final_corpus.txt", 100)
@@ -163,8 +167,6 @@ training_division_point = round(training_percentage * len(user_id_list))
 validation_division_point = training_division_point + round(validation_percentage * len(user_id_list))
 
 with open("data/statistics.csv", "w", encoding="utf-8") as f:
-    f.write("Statistics for corpus in general;;;;;;;;;;;;;;;;\n")
-    write_statistics_in_file(corpus, f)
     for i in range(10):
         f.write(";;;;;;;;;;;;;;;;\n")
         f.write("Alternative " + str(i) + ";;;;;;;;;;;;;;;;\n")
@@ -189,9 +191,9 @@ with open("data/statistics.csv", "w", encoding="utf-8") as f:
         f.write("Division proportion;Training;" + str(round((len(training)*100.0 / len(corpus)))) + "%;Validation;" + str(round((len(validation)*100.0 / len(corpus)))) + "%;Test;" + str(round((len(test)*100.0 / len(corpus)))) + "%;\n")
 
         f.write("Training set;;" + str(training_user_id) + ";;;;;;;;;;;;;;\n")
-        write_statistics_in_file(training, f)
+        write_statistics_in_file(corpus, training, f)
         f.write("Validation set;;" + str(validation_user_id) + ";;;;;;;;;;;;;;\n")
-        write_statistics_in_file(validation, f)
+        write_statistics_in_file(corpus, validation, f)
         f.write("Test set;;;;;;;;;;;;;;;;\n")
-        write_statistics_in_file(test, f)
+        write_statistics_in_file(corpus, test, f)
         f.write(";;;;\n")
