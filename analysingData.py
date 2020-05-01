@@ -1,3 +1,5 @@
+from random import shuffle
+
 import readCorpusData
 
 
@@ -10,6 +12,28 @@ def create_list_of_possible_categories_gender(corpus):
             post["gender"] = "Female"
         gender.append(post["gender"])
     return list(set(gender))
+
+
+def create_list_of_possible_categories_age(corpus):
+    age_list = []
+    for post in corpus:
+        age = int(post["age"])
+        if age < 20:
+            post["age"] = "<20"
+        elif age < 30:
+            post["age"] = "20-29"
+        elif age < 40:
+            post["age"] = "30-39"
+        elif age < 50:
+            post["age"] = "40-49"
+        elif age < 60:
+            post["age"] = "50-59"
+        elif age < 70:
+            post["age"] = "60-69"
+        else:
+            post["age"] = ">69"
+        age_list.append(post["age"])
+    return list(set(age_list))
 
 
 def create_list_of_possible_categories_country_part(corpus):
@@ -92,27 +116,82 @@ def get_statistics_for_category(corpus, category_name, category_list, thematic):
             dict[post[category_name]] += 1
     return dict
 
+def get_statistics(corpus,category,category_list,thematic):
+    statistics = get_statistics_for_category(corpus, category, category_list, thematic)
+    total = 0
+    for option in category_list:
+        total += statistics[option]
+    line1 = category.title() + ";Number of posts;;"
+    line2 = ";Percentage;;"
+    line3 = ";;;;;;;;;;;;;;;;"
+    for option in category_list:
+        line1 += option + ";"
+        line2 += ";"
+        line1 += str(statistics[option]) + ";"
+        line2 += str(round(int(statistics[option]) * 100.0 / int(total))) + "%;"
+    line1 += ";Total;" + str(total) + ";"
+    line2 += ";;;"
+    return line1 + "\n" + line2 + "\n" + line3 + "\n"
 
-corpus = readCorpusData.readCorpusFromFile("data/final_corpus.txt", 1000)
+
+def write_statistics_in_file(corpus, fout):
+    fout.write(get_statistics(corpus, "gender", gender_list, "All"))
+    fout.write(get_statistics(corpus, "age", age_list, "All"))
+    fout.write(get_statistics(corpus, "country_part", country_part_list, "All"))
+    fout.write(get_statistics(corpus, "region", region_list, "All"))
+
+
+corpus = readCorpusData.readCorpusFromFile("data/final_corpus.txt", 100)
+
 gender_list = create_list_of_possible_categories_gender(corpus)
+age_list = create_list_of_possible_categories_age(corpus)
+country_part_list = create_list_of_possible_categories_country_part(corpus)
+region_list = create_list_of_possible_categories_region(corpus)
 thematics_list = create_list_of_possible_forums_thematics(corpus)
+
 thematics_list.append("All")
-with open("data/gender_statistics.csv", "w", encoding="utf-8") as f:
-    for thematic in thematics_list:
-        statistics = get_statistics_for_category(corpus, "gender", gender_list, thematic)
-        total = 0
-        for gender in gender_list:
-            total += statistics[gender]
-        line1 = thematic + ";Number of posts;;"
-        line2 = ";Percentage;;"
-        line3 = ";;;;;;;;;;;;;;;;"
-        for gender in gender_list:
-            line1 += gender + ";"
-            line2 += ";"
-            line1 += str(statistics[gender]) + ";"
-            line2 += str(round(int(statistics[gender])*100.0/int(total))) + "%;"
-        line1 += ";Total;" + str(total) + ";"
-        line2 += ";;;"
-        f.write(line1 + "\n")
-        f.write(line2 + "\n")
-        f.write(line3 + "\n")
+
+training_percentage = 0.5
+validation_percentage = 0.25
+
+user_id_list = []
+for message_dict in corpus:
+    user_id_list.append(int(message_dict["user_id"]))
+user_id_list = list(set(user_id_list))
+
+training_division_point = round(training_percentage * len(user_id_list))
+validation_division_point = training_division_point + round(validation_percentage * len(user_id_list))
+
+with open("data/statistics.csv", "w", encoding="utf-8") as f:
+    f.write("Statistics for corpus in general;;;;;;;;;;;;;;;;\n")
+    write_statistics_in_file(corpus, f)
+    for i in range(10):
+        f.write(";;;;;;;;;;;;;;;;\n")
+        f.write("Alternative " + str(i) + ";;;;;;;;;;;;;;;;\n")
+        shuffle(user_id_list)
+
+        # dividing users into users that go to training set, validation set and test set
+        training_user_id = user_id_list[:training_division_point]
+        validation_user_id = user_id_list[training_division_point:validation_division_point]
+
+        training = []
+        validation = []
+        test = []
+        for message_dict in corpus:
+            user_id = int(message_dict["user_id"])
+            if user_id in training_user_id:
+                training.append(message_dict)
+            elif user_id in validation_user_id:
+                validation.append(message_dict)
+            else:
+                test.append(message_dict)
+
+        f.write("Division proportion;Training;" + str(round((len(training)*100.0 / len(corpus)))) + "%;Validation;" + str(round((len(validation)*100.0 / len(corpus)))) + "%;Test;" + str(round((len(test)*100.0 / len(corpus)))) + "%;\n")
+
+        f.write("Training set;;" + str(training_user_id) + ";;;;;;;;;;;;;;\n")
+        write_statistics_in_file(training, f)
+        f.write("Validation set;;" + str(validation_user_id) + ";;;;;;;;;;;;;;\n")
+        write_statistics_in_file(validation, f)
+        f.write("Test set;;;;;;;;;;;;;;;;\n")
+        write_statistics_in_file(test, f)
+        f.write(";;;;\n")
