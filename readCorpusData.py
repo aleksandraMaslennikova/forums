@@ -6,8 +6,8 @@ def readCorpusFromFile(filePath, docMaxLength):
     with open(filePath, encoding="utf8") as f:
         line = f.readline()
         text_arr = []
+        post_arr = []
         dict = {}
-        num_words = 0
         while line:
             if line.startswith("<doc"):
                 if len(corpus_arr) % 100 == 0:
@@ -83,18 +83,21 @@ def readCorpusFromFile(filePath, docMaxLength):
             elif re.match("^[0-9]", line):
                 line_arr = line.split("\t")
                 # line_arr[2] - word after lemmatization
-                text_arr.append(line_arr[1].lower() + "__" + line_arr[4])
-                num_words += 1
-            elif line == "\n" and num_words != 0:
-                if num_words >= docMaxLength:
+                post_arr.append(line_arr[1].lower() + "__" + line_arr[4])
+            elif line == "\n" and bool(dict):
+                if len(text_arr) + len(post_arr) <= docMaxLength:
+                    if len(post_arr) <= 200:
+                        text_arr += post_arr
+                    post_arr = []
+                else:
                     while not line.startswith("</doc"):
                         line = f.readline()
             if line.startswith("</doc"):
                 dict["text"] = text_arr
                 corpus_arr.append(dict)
                 text_arr = []
+                post_arr = []
                 dict = {}
-                num_words = 0
             line = f.readline()
     return corpus_arr
 
@@ -116,7 +119,7 @@ def getWordEmbeddingsItwac(word):
     return None
 
 def getWordEmbeddingsTwitter(word):
-    conn = sqlite3.connect("D:\\PycharmProjects\\forums_research\\data\\twitter_contesto_tweet.db")
+    conn = sqlite3.connect("C:\\Users\\User\\PycharmProjects\\forums\\data\\twitter_contesto_tweet.db")
     cursor = conn.cursor()
     if '"' in word and "'" in word:
         return None
