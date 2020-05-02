@@ -213,12 +213,12 @@ def divideDictInTrainingValidationTest(max_review_length, word_embedding_dict):
 
 
 divideDictInTrainingValidationTest(100, "twitter")
-"""
 divideDictInTrainingValidationTest(100, "itwac")
 divideDictInTrainingValidationTest(200, "twitter")
 divideDictInTrainingValidationTest(200, "itwac")
 divideDictInTrainingValidationTest(500, "twitter")
 divideDictInTrainingValidationTest(500, "itwac")
+"""
 divideDictInTrainingValidationTest(1000, "twitter")
 divideDictInTrainingValidationTest(1000, "itwac")
 """

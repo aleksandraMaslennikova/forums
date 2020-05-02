@@ -16,19 +16,19 @@ def transform_age_category(corpus):
     for post in corpus:
         age = int(post["age"])
         if age < 20:
-            post["age"] = "<20"
+            post["age"] = [1, 0, 0, 0, 0, 0, 0]
         elif age < 30:
-            post["age"] = "20-29"
+            post["age"] = [0, 1, 0, 0, 0, 0, 0]
         elif age < 40:
-            post["age"] = "30-39"
+            post["age"] = [0, 0, 1, 0, 0, 0, 0]
         elif age < 50:
-            post["age"] = "40-49"
+            post["age"] = [0, 0, 0, 1, 0, 0, 0]
         elif age < 60:
-            post["age"] = "50-59"
+            post["age"] = [0, 0, 0, 0, 1, 0, 0]
         elif age < 70:
-            post["age"] = "60-69"
+            post["age"] = [0, 0, 0, 0, 0, 1, 0]
         else:
-            post["age"] = ">69"
+            post["age"] = [0, 0, 0, 0, 0, 0, 1]
     return corpus
 
 def create_x_and_y(corpus, task):
@@ -69,13 +69,13 @@ numNeurons = [100]
 early_stopping_wait = 25
 repeat = 1
 num_categories = 7
-filePathMainInfoTrain = "results/results_age_training_" + str(word_embedding_dict) + "_max_length_" + str(word_embedding_dict)
-filePathMainInfoTest = "results/results_age_test_" + str(word_embedding_dict) + "_max_length_" + str(word_embedding_dict)
+filePathMainInfoTrain = "results/results_age_training_" + str(word_embedding_dict) + "_max_length_" + str(word_embedding_dict) + ".txt"
+filePathMainInfoTest = "results/results_age_test_" + str(word_embedding_dict) + "_max_length_" + str(word_embedding_dict) + ".txt"
 
 # data preparation
 with open('data/dict/' + str(word_embedding_dict) + '/' + str(max_review_length) + '/final_corpus_training_' + str(word_embedding_dict) + '_max_length_' + str(max_review_length) + '.pickle', 'rb') as handle:
     training = pickle.load(handle)
-training = training
+training = transform_age_category(training)
 X_train, y_train = create_x_and_y(training, task)
 try:
     del(training)
