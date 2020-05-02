@@ -6,13 +6,13 @@ from matplotlib import pyplot
 
 actual_epochs = 0
 
-def runTraining(X_train, y_train, X_validation, y_validation, num_neurons_lstm, early_stopping_patience, save_model_name):
+def runTraining(X_train, y_train, X_validation, y_validation, num_neurons_lstm, num_categories, early_stopping_patience, save_model_name):
     # create the model
     model = Sequential()
     model.add(Dropout(0.2))
     model.add(Bidirectional(LSTM(num_neurons_lstm)))
     model.add(Dropout(0.2))
-    model.add(Dense(5, activation='softmax'))
+    model.add(Dense(num_categories, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     es = EarlyStopping(monitor='val_accuracy', mode='max', verbose=1, patience=early_stopping_patience)
     mc = ModelCheckpoint(save_model_name, monitor='val_accuracy', mode='max', save_best_only=True, verbose=1)

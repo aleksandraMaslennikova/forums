@@ -68,12 +68,14 @@ task = "age"
 numNeurons = [100]
 early_stopping_wait = 25
 repeat = 1
-filePathMainInfoTrain = "data/results_age_training_" + str(word_embedding_dict) + "_max_length_" + str(word_embedding_dict)
-filePathMainInfoTest = "data/results_age_test_" + str(word_embedding_dict) + "_max_length_" + str(word_embedding_dict)
+num_categories = 7
+filePathMainInfoTrain = "results/results_age_training_" + str(word_embedding_dict) + "_max_length_" + str(word_embedding_dict)
+filePathMainInfoTest = "results/results_age_test_" + str(word_embedding_dict) + "_max_length_" + str(word_embedding_dict)
 
 # data preparation
 with open('data/dict/' + str(word_embedding_dict) + '/' + str(max_review_length) + '/final_corpus_training_' + str(word_embedding_dict) + '_max_length_' + str(max_review_length) + '.pickle', 'rb') as handle:
     training = pickle.load(handle)
+training = training
 X_train, y_train = create_x_and_y(training, task)
 try:
     del(training)
@@ -83,6 +85,7 @@ except Exception as e:
 
 with open('data/dict/' + str(word_embedding_dict) + '/' + str(max_review_length) + '/final_corpus_validation_' + str(word_embedding_dict) + '_max_length_' + str(max_review_length) + '.pickle', 'rb') as handle:
     validation = pickle.load(handle)
+validation = transform_age_category(validation)
 X_validation, y_validation = create_x_and_y(validation, task)
 try:
     del(validation)
@@ -101,7 +104,7 @@ with open(filePathMainInfoTrain, "w") as f:
         f.write("\n\t" + str(n) + " neurons" + "\n")
         for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
-            actual_epochs = lstm.classification.lstm_simple.runTraining(X_train, y_train, X_validation, y_validation, n, early_stopping_wait, save_model_name)
+            actual_epochs = lstm.classification.lstm_simple.runTraining(X_train, y_train, X_validation, y_validation, n, num_categories, early_stopping_wait, save_model_name)
             f.write(resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name, actual_epochs))
     f.write("\n")
 
@@ -112,7 +115,7 @@ with open(filePathMainInfoTrain, "w") as f:
         for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = lstm.classification.lstm_dropout_1.runTraining(X_train, y_train, X_validation,
-                                                                           y_validation, n, early_stopping_wait, save_model_name)
+                                                                           y_validation, n, num_categories, early_stopping_wait, save_model_name)
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
@@ -125,7 +128,7 @@ with open(filePathMainInfoTrain, "w") as f:
         for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = lstm.classification.lstm_dropout_2.runTraining(X_train, y_train, X_validation,
-                                                                           y_validation, n, early_stopping_wait, save_model_name)
+                                                                           y_validation, n, num_categories, early_stopping_wait, save_model_name)
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
@@ -138,7 +141,7 @@ with open(filePathMainInfoTrain, "w") as f:
         for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = lstm.classification.lstm_with_cnn.runTraining(X_train, y_train, X_validation,
-                                                                          y_validation, n, early_stopping_wait, save_model_name)
+                                                                          y_validation, n, num_categories, early_stopping_wait, save_model_name)
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
@@ -151,7 +154,7 @@ with open(filePathMainInfoTrain, "w") as f:
         for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = blstm.classification.blstm_simple.runTraining(X_train, y_train, X_validation,
-                                                                                 y_validation, n, early_stopping_wait, save_model_name)
+                                                                          y_validation, n, num_categories, early_stopping_wait, save_model_name)
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
@@ -164,8 +167,8 @@ with open(filePathMainInfoTrain, "w") as f:
         for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = blstm.classification.blstm_dropout_1.runTraining(X_train, y_train, X_validation,
-                                                                                    y_validation, n, early_stopping_wait,
-                                                                                    save_model_name)
+                                                                             y_validation, n, num_categories, early_stopping_wait,
+                                                                             save_model_name)
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
@@ -178,8 +181,8 @@ with open(filePathMainInfoTrain, "w") as f:
         for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = blstm.classification.blstm_dropout_2.runTraining(X_train, y_train, X_validation,
-                                                                                    y_validation, n, early_stopping_wait,
-                                                                                    save_model_name)
+                                                                             y_validation, n, num_categories, early_stopping_wait,
+                                                                             save_model_name)
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
@@ -192,7 +195,7 @@ with open(filePathMainInfoTrain, "w") as f:
         for i in range(repeat):
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = blstm.classification.blstm_with_cnn.runTraining(X_train, y_train, X_validation,
-                                                                                   y_validation, n, early_stopping_wait, save_model_name)
+                                                                            y_validation, n, num_categories, early_stopping_wait, save_model_name)
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
@@ -209,6 +212,7 @@ except Exception as e:
 
 with open('data/dict/' + str(word_embedding_dict) + '/' + str(max_review_length) + '/final_corpus_test_' + str(word_embedding_dict) + '_max_length_' + str(max_review_length) + '.pickle', 'rb') as handle:
     test = pickle.load(handle)
+test = transform_age_category(test)
 X_test, y_test = create_x_and_y(test, task)
 try:
     del(test)
