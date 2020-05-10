@@ -12,8 +12,12 @@ def runTraining(X_train, y_train, X_validation, y_validation, embedding_matrix, 
     model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu'))
     model.add(MaxPooling1D(pool_size=2))
     model.add(Bidirectional(LSTM(num_neurons_lstm)))
-    model.add(Dense(num_categories, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    if num_categories == 2:
+        model.add(Dense(1, activation='sigmoid'))
+        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    else:
+        model.add(Dense(num_categories, activation='softmax'))
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     es = EarlyStopping(monitor='val_accuracy', mode='max', verbose=1, patience=early_stopping_patience)
     mc = ModelCheckpoint(save_model_name, monitor='val_accuracy', mode='max', save_best_only=True, verbose=1)
     history = model.fit(X_train, y_train, validation_data=(X_validation, y_validation), epochs=1500, batch_size=batch_size,

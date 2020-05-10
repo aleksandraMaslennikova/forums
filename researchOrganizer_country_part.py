@@ -1,6 +1,4 @@
 import pickle
-from random import shuffle
-
 import numpy
 from keras.engine.saving import load_model
 from keras_preprocessing.sequence import pad_sequences
@@ -13,39 +11,6 @@ import blstm.classification.blstm_simple
 import blstm.classification.blstm_dropout_1
 import blstm.classification.blstm_dropout_2
 import blstm.classification.blstm_with_cnn
-
-
-def transform_age_category(corpus):
-    for post in corpus:
-        age = int(post["age"])
-        if age < 20:
-            post["age"] = [1, 0, 0, 0, 0, 0, 0]
-        elif age < 30:
-            post["age"] = [0, 1, 0, 0, 0, 0, 0]
-        elif age < 40:
-            post["age"] = [0, 0, 1, 0, 0, 0, 0]
-        elif age < 50:
-            post["age"] = [0, 0, 0, 1, 0, 0, 0]
-        elif age < 60:
-            post["age"] = [0, 0, 0, 0, 1, 0, 0]
-        elif age < 70:
-            post["age"] = [0, 0, 0, 0, 0, 1, 0]
-        else:
-            post["age"] = [0, 0, 0, 0, 0, 0, 1]
-    return corpus
-
-
-def transform_age_category_2(corpus, topic):
-    for post in corpus:
-        age = int(post["age"])
-        forums_thematic = post["forums_thematic"]
-        if age < 30 and forums_thematic == topic:
-            post["age"] = numpy.int64(0)
-        elif 49 < age < 70 and forums_thematic == topic:
-            post["age"] = numpy.int64(1)
-        else:
-            post["age"] = "to_del"
-    return corpus
 
 
 def create_x_y(corpus, task):
@@ -78,19 +43,18 @@ def resultsOfTest(X_test, y_test, save_model_name):
     return result_str
 
 # main variables notation
-max_review_length = 100
+max_review_length = 200
 word_embedding_dict = "twitter"
-task = "age"
-topic = "Watches"
-numNeurons = [5, 10, 25, 48, 50, 100, 129]
-#numNeurons = [100]
+task = "country_part"
+#numNeurons = [5, 10, 25, 50, 100]
+numNeurons = [100]
 batch_size = 500
-early_stopping_wait = 100
+early_stopping_wait = 25
 repeat = 1
-num_categories = 2
-filePathMainInfoTrain = "results/results_age_in-domain_" + str(topic) + "_" + str(word_embedding_dict) + "_max_length_" + str(max_review_length) + ".txt"
+num_categories = 5
+filePathMainInfoTrain = "results/results_" + task + "_training_" + str(word_embedding_dict) + "_max_length_" + str(max_review_length) + ".txt"
+filePathMainInfoTest = "results/results_" + task + "_test_" + str(word_embedding_dict) + "_max_length_" + str(max_review_length) + ".txt"
 
-"""
 training_user_id = ['804', '1783', '330', '68', '1268', '1094', '1556', '296', '384', '1649', '1286', '1924', '734',
                     '1175', '476', '1390', '300', '1327', '1567', '395', '1980', '1259', '1407', '1796', '494',
                     '169', '869', '284', '1570', '1234', '593', '1949', '447', '1926', '986', '1794', '1254',
@@ -251,37 +215,14 @@ test_user_id = ['1', '2', '3', '4', '21', '22', '24', '25', '32', '33', '43', '4
                 '1896', '1897', '1908', '1911', '1913', '1917', '1923', '1928', '1930', '1933', '1937', '1938',
                 '1942', '1946', '1948', '1956', '1957', '1962', '1967', '1970', '1971', '1972', '1978', '1979',
                 '1981', '1986', '1990', '1996']
-"""
 
 with open('data/final_corpus_dictionary_max_length_' + str(max_review_length) + '.pickle', 'rb') as handle:
     corpus = pickle.load(handle)
-corpus = transform_age_category_2(corpus, topic)
-posts_id_to_del = []
-for i in range(len(corpus)):
-    if corpus[i]["age"] == "to_del":
-        posts_id_to_del.append(i)
-    elif len(corpus[i]["text_sequence"]) == 0:
-        posts_id_to_del.append(i)
-for index in sorted(posts_id_to_del, reverse=True):
-    del corpus[index]
-
-training_percentage = 0.5
-validation_percentage = 0.25
-user_id_list = []
-for message_dict in corpus:
-    user_id_list.append(int(message_dict["user_id"]))
-user_id_list = list(set(user_id_list))
-training_division_point = round(training_percentage * len(user_id_list))
-validation_division_point = training_division_point + round(validation_percentage * len(user_id_list))
-shuffle(user_id_list)
-training_user_id = user_id_list[:training_division_point]
-validation_user_id = user_id_list[training_division_point:validation_division_point]
-
 training = []
 validaton = []
 test = []
 for message_dict in corpus:
-    user_id = int(message_dict["user_id"])
+    user_id = message_dict["user_id"]
     if user_id in training_user_id:
         training.append(message_dict)
     elif user_id in validation_user_id:
@@ -304,44 +245,6 @@ else:
         embedding_matrix = pickle.load(handle)
 
 with open(filePathMainInfoTrain, "w") as f:
-    num_0 = 0
-    num_1 = 0
-    for post in corpus:
-        if post["age"] == 0:
-            num_0 += 1
-        if post["age"] == 1:
-            num_1 += 1
-    f.write("<30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(corpus))) + "%\n")
-    f.write(">49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(corpus))) + "%\n")
-    num_0 = 0
-    num_1 = 0
-    for post in training:
-        if post["age"] == 0:
-            num_0 += 1
-        if post["age"] == 1:
-            num_1 += 1
-    f.write("training <30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(training))) + "%\n")
-    f.write("training >49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(training))) + "%\n")
-    num_0 = 0
-    num_1 = 0
-    for post in validaton:
-        if post["age"] == 0:
-            num_0 += 1
-        if post["age"] == 1:
-            num_1 += 1
-    f.write("validation <30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(validaton))) + "%\n")
-    f.write("validation >49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(validaton))) + "%\n")
-    num_0 = 0
-    num_1 = 0
-    for post in test:
-        if post["age"] == 0:
-            num_0 += 1
-        if post["age"] == 1:
-            num_1 += 1
-    f.write("test <30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(test))) + "%\n")
-    f.write("test >49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(test))) + "%\n")
-
-with open(filePathMainInfoTrain, "w+") as f:
     f.write("\nSimple LSTM\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_simple_neurons_" + str(n) + "_attempt_0"
@@ -350,10 +253,8 @@ with open(filePathMainInfoTrain, "w+") as f:
             save_model_name = save_model_name[:-1] + str(i+1)
             actual_epochs = lstm.classification.lstm_simple.runTraining(X_train, y_train, X_validation, y_validation, embedding_matrix, n, num_categories, batch_size, early_stopping_wait, save_model_name)
             f.write(resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name, actual_epochs))
-            f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
 
-with open(filePathMainInfoTrain, "w+") as f:
     f.write("\nLSTM Dropout 1\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_dropout_1_neurons_" + str(n) + "_attempt_0"
@@ -364,10 +265,8 @@ with open(filePathMainInfoTrain, "w+") as f:
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
-            f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
 
-with open(filePathMainInfoTrain, "w+") as f:
     f.write("\nLSTM Dropout 2\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_dropout_2_neurons_" + str(n) + "_attempt_0"
@@ -378,10 +277,8 @@ with open(filePathMainInfoTrain, "w+") as f:
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
-            f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
 
-with open(filePathMainInfoTrain, "w+") as f:
     f.write("\nLSTM with CNN\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_with_cnn_neurons_" + str(n) + "_attempt_0"
@@ -392,10 +289,8 @@ with open(filePathMainInfoTrain, "w+") as f:
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
-            f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
 
-with open(filePathMainInfoTrain, "w+") as f:
     f.write("\nSimple BLSTM\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_simple_neurons_" + str(n) + "_attempt_0"
@@ -406,10 +301,8 @@ with open(filePathMainInfoTrain, "w+") as f:
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
-            f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
 
-with open(filePathMainInfoTrain, "w+") as f:
     f.write("\nBLSTM Dropout 1\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_dropout_1_neurons_" + str(n) + "_attempt_0"
@@ -420,10 +313,8 @@ with open(filePathMainInfoTrain, "w+") as f:
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
-            f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
 
-with open(filePathMainInfoTrain, "w+") as f:
     f.write("\nBLSTM Dropout 2\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_dropout_2_neurons_" + str(n) + "_attempt_0"
@@ -434,10 +325,8 @@ with open(filePathMainInfoTrain, "w+") as f:
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
-            f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
 
-with open(filePathMainInfoTrain, "w+") as f:
     f.write("\nBLSTM with CNN\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_with_cnn_neurons_" + str(n) + "_attempt_0"
@@ -448,5 +337,78 @@ with open(filePathMainInfoTrain, "w+") as f:
             f.write(
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
+    f.write("\n")
+
+
+with open(filePathMainInfoTest, "w") as f:
+    f.write("\nSimple LSTM\n")
+    for n in numNeurons:
+        save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_simple_neurons_" + str(n) + "_attempt_0"
+        f.write("\n\t" + str(n) + " neurons" + "\n")
+        for i in range(repeat):
+            save_model_name = save_model_name[:-1] + str(i+1)
+            f.write(resultsOfTest(X_test, y_test, save_model_name))
+    f.write("\n")
+
+    f.write("\nLSTM Dropout 1\n")
+    for n in numNeurons:
+        save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_dropout_1_neurons_" + str(n) + "_attempt_0"
+        f.write("\n\t" + str(n) + " neurons" + "\n")
+        for i in range(repeat):
+            save_model_name = save_model_name[:-1] + str(i+1)
+            f.write(resultsOfTest(X_test, y_test, save_model_name))
+    f.write("\n")
+
+    f.write("\nLSTM Dropout 2\n")
+    for n in numNeurons:
+        save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_dropout_2_neurons_" + str(n) + "_attempt_0"
+        f.write("\n\t" + str(n) + " neurons" + "\n")
+        for i in range(repeat):
+            save_model_name = save_model_name[:-1] + str(i+1)
+            f.write(resultsOfTest(X_test, y_test, save_model_name))
+    f.write("\n")
+
+    f.write("\nLSTM with CNN\n")
+    for n in numNeurons:
+        save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_with_cnn_neurons_" + str(n) + "_attempt_0"
+        f.write("\n\t" + str(n) + " neurons" + "\n")
+        for i in range(repeat):
+            save_model_name = save_model_name[:-1] + str(i+1)
+            f.write(resultsOfTest(X_test, y_test, save_model_name))
+    f.write("\n")
+
+    f.write("\nSimple BLSTM\n")
+    for n in numNeurons:
+        save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_simple_neurons_" + str(n) + "_attempt_0"
+        f.write("\n\t" + str(n) + " neurons" + "\n")
+        for i in range(repeat):
+            save_model_name = save_model_name[:-1] + str(i+1)
+            f.write(resultsOfTest(X_test, y_test, save_model_name))
+    f.write("\n")
+
+    f.write("\nBLSTM Dropout 1\n")
+    for n in numNeurons:
+        save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_dropout_1_neurons_" + str(n) + "_attempt_0"
+        f.write("\n\t" + str(n) + " neurons" + "\n")
+        for i in range(repeat):
+            save_model_name = save_model_name[:-1] + str(i+1)
+            f.write(resultsOfTest(X_test, y_test, save_model_name))
+    f.write("\n")
+
+    f.write("\nBLSTM Dropout 2\n")
+    for n in numNeurons:
+        save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_dropout_2_neurons_" + str(n) + "_attempt_0"
+        f.write("\n\t" + str(n) + " neurons" + "\n")
+        for i in range(repeat):
+            save_model_name = save_model_name[:-1] + str(i+1)
+            f.write(resultsOfTest(X_test, y_test, save_model_name))
+    f.write("\n")
+
+    f.write("\nBLSTM with CNN\n")
+    for n in numNeurons:
+        save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_with_cnn_neurons_" + str(n) + "_attempt_0"
+        f.write("\n\t" + str(n) + " neurons" + "\n")
+        for i in range(repeat):
+            save_model_name = save_model_name[:-1] + str(i+1)
             f.write(resultsOfTest(X_test, y_test, save_model_name))
     f.write("\n")
