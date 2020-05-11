@@ -119,7 +119,7 @@ def getWordEmbeddingsItwac(word):
     return None
 
 def getWordEmbeddingsTwitter(word):
-    conn = sqlite3.connect("C:\\Users\\User\\PycharmProjects\\forums\\data\\twitter_contesto_tweet.db")
+    conn = sqlite3.connect("D:\\PycharmProjects\\forums_research\\data\\twitter_contesto_tweet.db")
     cursor = conn.cursor()
     if '"' in word and "'" in word:
         return None

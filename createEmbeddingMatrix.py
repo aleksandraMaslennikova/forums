@@ -68,7 +68,7 @@ for i in range(len(corpus)):
 with open('data/final_corpus_dictionary_max_length_100.pickle', 'wb') as handle:
     pickle.dump(corpus, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-#with open('data/itwac_word_embedding_matrix.pickle', 'wb') as handle:
-#    pickle.dump(create_embedding_matrix("itwac", t), handle, protocol=pickle.HIGHEST_PROTOCOL)
-with open('data/twitter_word_embedding_matrix.pickle', 'wb') as handle:
-    pickle.dump(create_embedding_matrix("twitter", t), handle, protocol=pickle.HIGHEST_PROTOCOL)
+with open('data/itwac_word_embedding_matrix.pickle', 'wb') as handle:
+    pickle.dump(create_embedding_matrix("itwac", t), handle, protocol=pickle.HIGHEST_PROTOCOL)
+#with open('data/twitter_word_embedding_matrix.pickle', 'wb') as handle:
+#    pickle.dump(create_embedding_matrix("twitter", t), handle, protocol=pickle.HIGHEST_PROTOCOL)

@@ -78,12 +78,11 @@ def resultsOfTest(X_test, y_test, save_model_name):
     return result_str
 
 # main variables notation
-max_review_length = 100
+max_review_length = 500
 word_embedding_dict = "twitter"
 task = "age"
 topic = "Watches"
 numNeurons = [5, 10, 25, 48, 50, 100, 129]
-#numNeurons = [100]
 batch_size = 500
 early_stopping_wait = 100
 repeat = 1
@@ -252,6 +251,14 @@ test_user_id = ['1', '2', '3', '4', '21', '22', '24', '25', '32', '33', '43', '4
                 '1942', '1946', '1948', '1956', '1957', '1962', '1967', '1970', '1971', '1972', '1978', '1979',
                 '1981', '1986', '1990', '1996']
 """
+training_user_id_watches = [524, 754, 537, 854, 529, 520, 605, 848, 525, 719, 825, 809, 510, 606, 687, 806, 452, 607,
+                            493, 588, 823, 623, 762, 536, 612, 603, 517, 744, 563, 581, 624, 371, 530, 650, 370, 498,
+                            713, 721, 857, 618, 671, 831, 540, 822, 590, 679, 582, 579, 760, 689, 658, 850, 633, 655,
+                            697, 765, 495, 816, 804, 637, 682, 635, 599, 630, 701, 805, 672, 598, 832, 162, 617, 545,
+                            675, 827, 768, 654, 800, 601, 778, 759, 586, 508, 653, 80]
+validation_user_id_watches = [753, 670, 509, 532, 496, 758, 840, 48, 851, 813, 841, 711, 584, 788, 856, 795, 833, 589,
+                              292, 712, 803, 737, 506, 627, 363, 702, 640, 834, 539, 665, 621, 731, 796, 839, 695, 638,
+                              787, 79, 398, 514, 764, 538]
 
 with open('data/final_corpus_dictionary_max_length_' + str(max_review_length) + '.pickle', 'rb') as handle:
     corpus = pickle.load(handle)
@@ -265,26 +272,14 @@ for i in range(len(corpus)):
 for index in sorted(posts_id_to_del, reverse=True):
     del corpus[index]
 
-training_percentage = 0.5
-validation_percentage = 0.25
-user_id_list = []
-for message_dict in corpus:
-    user_id_list.append(int(message_dict["user_id"]))
-user_id_list = list(set(user_id_list))
-training_division_point = round(training_percentage * len(user_id_list))
-validation_division_point = training_division_point + round(validation_percentage * len(user_id_list))
-shuffle(user_id_list)
-training_user_id = user_id_list[:training_division_point]
-validation_user_id = user_id_list[training_division_point:validation_division_point]
-
 training = []
 validaton = []
 test = []
 for message_dict in corpus:
     user_id = int(message_dict["user_id"])
-    if user_id in training_user_id:
+    if user_id in training_user_id_watches:
         training.append(message_dict)
-    elif user_id in validation_user_id:
+    elif user_id in validation_user_id_watches:
         validaton.append(message_dict)
     else:
         test.append(message_dict)
@@ -297,10 +292,10 @@ X_test, y_test = create_x_y(test, task)
 X_test = pad_sequences(X_test, maxlen=max_review_length, padding='post')
 
 if word_embedding_dict == "itwac":
-    with open('data/itwac.pickle', 'rb') as handle:
+    with open('data/itwac_word_embedding_matrix.pickle', 'rb') as handle:
         embedding_matrix = pickle.load(handle)
 else:
-    with open('data/twitter.pickle', 'rb') as handle:
+    with open('data/twitter_word_embedding_matrix.pickle', 'rb') as handle:
         embedding_matrix = pickle.load(handle)
 
 with open(filePathMainInfoTrain, "w") as f:
