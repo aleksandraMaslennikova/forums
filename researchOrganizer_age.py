@@ -335,8 +335,10 @@ with open(filePathMainInfoTrain, "w") as f:
             num_1 += 1
     f.write("test <30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(test))) + "%\n")
     f.write("test >49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(test))) + "%\n")
+    f.flush()
+    f.close()
 
-with open(filePathMainInfoTrain, "w+") as f:
+with open(filePathMainInfoTrain, "a") as f:
     f.write("\nSimple LSTM\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_simple_neurons_" + str(n) + "_attempt_0"
@@ -346,9 +348,11 @@ with open(filePathMainInfoTrain, "w+") as f:
             actual_epochs = lstm.classification.lstm_simple.runTraining(X_train, y_train, X_validation, y_validation, embedding_matrix, n, num_categories, batch_size, early_stopping_wait, save_model_name)
             f.write(resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name, actual_epochs))
             f.write(resultsOfTest(X_test, y_test, save_model_name))
+            f.flush()
     f.write("\n")
+    f.close()
 
-with open(filePathMainInfoTrain, "w+") as f:
+with open(filePathMainInfoTrain, "a") as f:
     f.write("\nLSTM Dropout 1\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_dropout_1_neurons_" + str(n) + "_attempt_0"
@@ -360,9 +364,11 @@ with open(filePathMainInfoTrain, "w+") as f:
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
             f.write(resultsOfTest(X_test, y_test, save_model_name))
+            f.flush()
     f.write("\n")
+    f.close()
 
-with open(filePathMainInfoTrain, "w+") as f:
+with open(filePathMainInfoTrain, "a") as f:
     f.write("\nLSTM Dropout 2\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_dropout_2_neurons_" + str(n) + "_attempt_0"
@@ -374,9 +380,11 @@ with open(filePathMainInfoTrain, "w+") as f:
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
             f.write(resultsOfTest(X_test, y_test, save_model_name))
+            f.flush()
     f.write("\n")
+    f.close()
 
-with open(filePathMainInfoTrain, "w+") as f:
+with open(filePathMainInfoTrain, "a") as f:
     f.write("\nLSTM with CNN\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/lstm_with_cnn_neurons_" + str(n) + "_attempt_0"
@@ -388,9 +396,11 @@ with open(filePathMainInfoTrain, "w+") as f:
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
             f.write(resultsOfTest(X_test, y_test, save_model_name))
+            f.flush()
     f.write("\n")
+    f.close()
 
-with open(filePathMainInfoTrain, "w+") as f:
+with open(filePathMainInfoTrain, "a") as f:
     f.write("\nSimple BLSTM\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_simple_neurons_" + str(n) + "_attempt_0"
@@ -402,9 +412,11 @@ with open(filePathMainInfoTrain, "w+") as f:
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
             f.write(resultsOfTest(X_test, y_test, save_model_name))
+            f.flush()
     f.write("\n")
+    f.close()
 
-with open(filePathMainInfoTrain, "w+") as f:
+with open(filePathMainInfoTrain, "a") as f:
     f.write("\nBLSTM Dropout 1\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_dropout_1_neurons_" + str(n) + "_attempt_0"
@@ -416,9 +428,11 @@ with open(filePathMainInfoTrain, "w+") as f:
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
             f.write(resultsOfTest(X_test, y_test, save_model_name))
+            f.flush()
     f.write("\n")
+    f.close()
 
-with open(filePathMainInfoTrain, "w+") as f:
+with open(filePathMainInfoTrain, "a") as f:
     f.write("\nBLSTM Dropout 2\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_dropout_2_neurons_" + str(n) + "_attempt_0"
@@ -430,9 +444,11 @@ with open(filePathMainInfoTrain, "w+") as f:
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
             f.write(resultsOfTest(X_test, y_test, save_model_name))
+            f.flush()
     f.write("\n")
+    f.close()
 
-with open(filePathMainInfoTrain, "w+") as f:
+with open(filePathMainInfoTrain, "a") as f:
     f.write("\nBLSTM with CNN\n")
     for n in numNeurons:
         save_model_name = "models/" + str(task) + "/" + str(word_embedding_dict) + "/" + str(max_review_length) + "/blstm_with_cnn_neurons_" + str(n) + "_attempt_0"
@@ -444,4 +460,6 @@ with open(filePathMainInfoTrain, "w+") as f:
                 resultsOfTrainingToFile(X_train, y_train, X_validation, y_validation, save_model_name,
                                         actual_epochs))
             f.write(resultsOfTest(X_test, y_test, save_model_name))
+            f.flush()
     f.write("\n")
+    f.close()
