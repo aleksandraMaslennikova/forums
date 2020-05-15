@@ -15,23 +15,22 @@ import blstm.classification.blstm_dropout_2
 import blstm.classification.blstm_with_cnn
 
 
-def transform_age_category(corpus):
+def transform_age_category_5(corpus, topic):
     for post in corpus:
         age = int(post["age"])
-        if age < 20:
-            post["age"] = [1, 0, 0, 0, 0, 0, 0]
-        elif age < 30:
-            post["age"] = [0, 1, 0, 0, 0, 0, 0]
-        elif age < 40:
-            post["age"] = [0, 0, 1, 0, 0, 0, 0]
-        elif age < 50:
-            post["age"] = [0, 0, 0, 1, 0, 0, 0]
-        elif age < 60:
-            post["age"] = [0, 0, 0, 0, 1, 0, 0]
-        elif age < 70:
-            post["age"] = [0, 0, 0, 0, 0, 1, 0]
+        forums_thematic = post["forums_thematic"]
+        if 19 < age < 30 and forums_thematic == topic:
+            post["age"] = [1, 0, 0, 0, 0]
+        elif 29 < age < 40 and forums_thematic == topic:
+            post["age"] = [0, 1, 0, 0, 0]
+        elif 39 < age < 50 and forums_thematic == topic:
+            post["age"] = [0, 0, 1, 0, 0]
+        elif 49 < age < 60 and forums_thematic == topic:
+            post["age"] = [0, 0, 0, 1, 0]
+        elif 59 < age < 70 and forums_thematic == topic:
+            post["age"] = [0, 0, 0, 0, 1]
         else:
-            post["age"] = [0, 0, 0, 0, 0, 0, 1]
+            post["age"] = "to_del"
     return corpus
 
 
@@ -78,7 +77,7 @@ def resultsOfTest(X_test, y_test, save_model_name):
     return result_str
 
 # main variables notation
-max_review_length = 500
+max_review_length = 200
 word_embedding_dict = "twitter"
 task = "age"
 topic = "Watches"
@@ -86,7 +85,7 @@ numNeurons = [5, 10, 25, 48, 50, 100, 129]
 batch_size = 500
 early_stopping_wait = 100
 repeat = 1
-num_categories = 2
+num_categories = 5
 filePathMainInfoTrain = "results/results_age_in-domain_" + str(topic) + "_" + str(word_embedding_dict) + "_max_length_" + str(max_review_length) + ".txt"
 
 """
@@ -251,18 +250,39 @@ test_user_id = ['1', '2', '3', '4', '21', '22', '24', '25', '32', '33', '43', '4
                 '1942', '1946', '1948', '1956', '1957', '1962', '1967', '1970', '1971', '1972', '1978', '1979',
                 '1981', '1986', '1990', '1996']
 """
-training_user_id_watches = [524, 754, 537, 854, 529, 520, 605, 848, 525, 719, 825, 809, 510, 606, 687, 806, 452, 607,
+training_user_id_watches_two_groups = [524, 754, 537, 854, 529, 520, 605, 848, 525, 719, 825, 809, 510, 606, 687, 806, 452, 607,
                             493, 588, 823, 623, 762, 536, 612, 603, 517, 744, 563, 581, 624, 371, 530, 650, 370, 498,
                             713, 721, 857, 618, 671, 831, 540, 822, 590, 679, 582, 579, 760, 689, 658, 850, 633, 655,
                             697, 765, 495, 816, 804, 637, 682, 635, 599, 630, 701, 805, 672, 598, 832, 162, 617, 545,
                             675, 827, 768, 654, 800, 601, 778, 759, 586, 508, 653, 80]
-validation_user_id_watches = [753, 670, 509, 532, 496, 758, 840, 48, 851, 813, 841, 711, 584, 788, 856, 795, 833, 589,
+validation_user_id_watches_two_groups = [753, 670, 509, 532, 496, 758, 840, 48, 851, 813, 841, 711, 584, 788, 856, 795, 833, 589,
                               292, 712, 803, 737, 506, 627, 363, 702, 640, 834, 539, 665, 621, 731, 796, 839, 695, 638,
                               787, 79, 398, 514, 764, 538]
+training_user_id_watches_five_groups = [794, 681, 508, 649, 529, 712, 620, 699, 761, 526, 498, 715, 586, 564, 671, 825,
+                                        497, 802, 507, 520, 596, 503, 751, 820, 370, 688, 515, 695, 560, 822, 578, 363,
+                                        572, 585, 658, 506, 740, 733, 765, 525, 837, 713, 500, 767, 644, 533, 581, 754,
+                                        823, 696, 674, 824, 737, 781, 636, 690, 608, 651, 795, 367, 601, 742, 702, 789,
+                                        563, 720, 613, 721, 775, 808, 652, 452, 687, 689, 557, 849, 602, 656, 748, 835,
+                                        545, 807, 759, 755, 729, 552, 809, 607, 518, 590, 853, 513, 555, 657, 785, 832,
+                                        38, 811, 244, 598, 677, 768, 777, 541, 522, 670, 782, 571, 553, 510, 667, 594,
+                                        493, 562, 629, 805, 693, 845, 783, 592, 530, 499, 618, 852, 531, 800, 666, 599,
+                                        723, 704, 519, 547, 846, 685, 747, 589, 842, 861, 605, 796, 626, 625, 645, 764,
+                                        774, 603, 617, 745, 847, 719, 856, 786, 542, 678, 539, 703, 717, 548, 502, 593,
+                                        514, 843, 243, 697, 512, 574, 623, 700, 730, 621, 710, 749, 813, 812, 828, 857,
+                                        814, 750, 619, 524, 648, 606, 212, 511, 650, 559, 718, 778, 633, 827, 398, 580,
+                                        292, 711, 821]
+validation_user_id_watches_five_groups = [641, 565, 804, 394, 582, 691, 746, 826, 757, 758, 819, 791, 162, 854, 643,
+                                          744, 772, 851, 738, 763, 694, 815, 676, 787, 725, 352, 642, 532, 443, 475,
+                                          669, 728, 600, 135, 635, 858, 701, 573, 762, 790, 739, 743, 639, 848, 611,
+                                          495, 727, 534, 551, 831, 665, 588, 632, 705, 722, 583, 604, 655, 680, 683,
+                                          724, 535, 732, 803, 579, 566, 816, 829, 792, 527, 615, 536, 663, 756, 494,
+                                          818, 653, 544, 675, 79, 587, 776, 616, 770, 610, 622, 549, 597, 646, 661,
+                                          773, 752, 396, 538, 801, 760, 855, 769]
+
 
 with open('data/final_corpus_dictionary_max_length_' + str(max_review_length) + '.pickle', 'rb') as handle:
     corpus = pickle.load(handle)
-corpus = transform_age_category_2(corpus, topic)
+corpus = transform_age_category_5(corpus, topic)
 posts_id_to_del = []
 for i in range(len(corpus)):
     if corpus[i]["age"] == "to_del":
@@ -273,20 +293,28 @@ for index in sorted(posts_id_to_del, reverse=True):
     del corpus[index]
 
 training = []
-validaton = []
+validation = []
 test = []
+training_user_id = []
+validation_user_id = []
+if topic == "Watches" and num_categories == 2:
+    training_user_id = training_user_id_watches_two_groups
+    validation_user_id = validation_user_id_watches_two_groups
+elif topic == "Watches" and num_categories == 5:
+    training_user_id = training_user_id_watches_five_groups
+    validation_user_id = validation_user_id_watches_five_groups
 for message_dict in corpus:
     user_id = int(message_dict["user_id"])
-    if user_id in training_user_id_watches:
+    if user_id in training_user_id:
         training.append(message_dict)
-    elif user_id in validation_user_id_watches:
-        validaton.append(message_dict)
+    elif user_id in validation_user_id:
+        validation.append(message_dict)
     else:
         test.append(message_dict)
-
+        
 X_train, y_train = create_x_y(training, task)
 X_train = pad_sequences(X_train, maxlen=max_review_length, padding='post')
-X_validation, y_validation = create_x_y(validaton, task)
+X_validation, y_validation = create_x_y(validation, task)
 X_validation = pad_sequences(X_validation, maxlen=max_review_length, padding='post')
 X_test, y_test = create_x_y(test, task)
 X_test = pad_sequences(X_test, maxlen=max_review_length, padding='post')
@@ -299,42 +327,76 @@ else:
         embedding_matrix = pickle.load(handle)
 
 with open(filePathMainInfoTrain, "w") as f:
-    num_0 = 0
-    num_1 = 0
-    for post in corpus:
-        if post["age"] == 0:
-            num_0 += 1
-        if post["age"] == 1:
-            num_1 += 1
-    f.write("<30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(corpus))) + "%\n")
-    f.write(">49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(corpus))) + "%\n")
-    num_0 = 0
-    num_1 = 0
-    for post in training:
-        if post["age"] == 0:
-            num_0 += 1
-        if post["age"] == 1:
-            num_1 += 1
-    f.write("training <30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(training))) + "%\n")
-    f.write("training >49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(training))) + "%\n")
-    num_0 = 0
-    num_1 = 0
-    for post in validaton:
-        if post["age"] == 0:
-            num_0 += 1
-        if post["age"] == 1:
-            num_1 += 1
-    f.write("validation <30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(validaton))) + "%\n")
-    f.write("validation >49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(validaton))) + "%\n")
-    num_0 = 0
-    num_1 = 0
-    for post in test:
-        if post["age"] == 0:
-            num_0 += 1
-        if post["age"] == 1:
-            num_1 += 1
-    f.write("test <30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(test))) + "%\n")
-    f.write("test >49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(test))) + "%\n")
+    if topic == "Watches" and num_categories == 2:
+        num_0 = 0
+        num_1 = 0
+        for post in corpus:
+            if post["age"] == 0:
+                num_0 += 1
+            if post["age"] == 1:
+                num_1 += 1
+        f.write("<30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(corpus))) + "%\n")
+        f.write(">49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(corpus))) + "%\n")
+        num_0 = 0
+        num_1 = 0
+        for post in training:
+            if post["age"] == 0:
+                num_0 += 1
+            if post["age"] == 1:
+                num_1 += 1
+        f.write("training <30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(training))) + "%\n")
+        f.write("training >49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(training))) + "%\n")
+        num_0 = 0
+        num_1 = 0
+        for post in validation:
+            if post["age"] == 0:
+                num_0 += 1
+            if post["age"] == 1:
+                num_1 += 1
+        f.write("validation <30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(validation))) + "%\n")
+        f.write("validation >49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(validation))) + "%\n")
+        num_0 = 0
+        num_1 = 0
+        for post in test:
+            if post["age"] == 0:
+                num_0 += 1
+            if post["age"] == 1:
+                num_1 += 1
+        f.write("test <30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(test))) + "%\n")
+        f.write("test >49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(test))) + "%\n")
+    elif topic == "Watches" and num_categories == 5:
+        arr_categories = [0, 0, 0, 0, 0]
+        arr_labels = ["20-29", "30-39", "40-49", "50-59", "60-69"]
+        for post in corpus:
+            for i in range(len(arr_categories)):
+                arr_categories[i] += post["age"][i]
+        for i in range(len(arr_categories)):
+            f.write(arr_labels[i] + ": " + str(arr_categories[i]) + "; percent: " + str(
+                round(arr_categories[i] * 100.0 / len(corpus))) + "%\n")
+
+        arr_categories = [0, 0, 0, 0, 0]
+        for post in training:
+            for i in range(len(arr_categories)):
+                arr_categories[i] += post["age"][i]
+        for i in range(len(arr_categories)):
+            f.write("training " + arr_labels[i] + ": " + str(arr_categories[i]) + "; percent: " + str(
+                round(arr_categories[i] * 100.0 / len(training))) + "%\n")
+
+        arr_categories = [0, 0, 0, 0, 0]
+        for post in validation:
+            for i in range(len(arr_categories)):
+                arr_categories[i] += post["age"][i]
+        for i in range(len(arr_categories)):
+            f.write("validation " + arr_labels[i] + ": " + str(arr_categories[i]) + "; percent: " + str(
+                round(arr_categories[i] * 100.0 / len(validation))) + "%\n")
+
+        arr_categories = [0, 0, 0, 0, 0]
+        for post in test:
+            for i in range(len(arr_categories)):
+                arr_categories[i] += post["age"][i]
+        for i in range(len(arr_categories)):
+            f.write("test " + arr_labels[i] + ": " + str(arr_categories[i]) + "; percent: " + str(
+                round(arr_categories[i] * 100.0 / len(test))) + "%\n")
     f.flush()
     f.close()
 
