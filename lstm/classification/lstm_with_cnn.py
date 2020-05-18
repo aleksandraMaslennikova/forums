@@ -29,3 +29,26 @@ def runTraining(X_train, y_train, X_validation, y_validation, embedding_matrix, 
     pyplot.legend()
     pyplot.show()
     return es.stopped_epoch - early_stopping_patience
+
+
+def runTraining_k_fold(X_train, y_train, embedding_matrix, num_neurons_lstm, num_categories, batch_size, num_epochs, save_model_name):
+    # create the model
+    model = Sequential()
+    e = Embedding(len(embedding_matrix), 129, weights=[embedding_matrix], trainable=False)
+    model.add(e)
+    model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu'))
+    model.add(MaxPooling1D(pool_size=2))
+    model.add(LSTM(num_neurons_lstm))
+    if num_categories == 2:
+        model.add(Dense(1, activation='sigmoid'))
+        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    else:
+        model.add(Dense(num_categories, activation='softmax'))
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    history = model.fit(X_train, y_train, validation_split=0, epochs=num_epochs, batch_size=batch_size)
+    model.save(save_model_name)
+    # plot training history
+    pyplot.title(save_model_name)
+    pyplot.plot(history.history['loss'], label='train')
+    pyplot.legend()
+    pyplot.show()
