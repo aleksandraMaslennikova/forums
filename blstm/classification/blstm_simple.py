@@ -47,4 +47,5 @@ def runTraining_k_fold(X_train, y_train, embedding_matrix, num_neurons_lstm, num
     pyplot.title(save_model_name)
     pyplot.plot(history.history['loss'], label='train')
     pyplot.legend()
+    pyplot.savefig(save_model_name + ".png")
     pyplot.show()
