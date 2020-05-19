@@ -1,4 +1,6 @@
+import os
 import pickle
+import shutil
 from pathlib import Path
 import numpy
 from keras.engine.saving import load_model
@@ -80,7 +82,7 @@ def train(nn_type):
                 X_validation, y_validation = create_x_y(validation, task)
                 X_validation = pad_sequences(X_validation, maxlen=max_len_post, padding='post')
 
-                path = "models/" + str(task) + "/K-fold/" + str(max_len_post) + "/neurons_" + str(num_neurons) + "/" + nn_type + "/Attempt " + str(i+1) + "/K-Fold-models/"
+                path = "models/" + str(task) + "/K-fold/" + str(max_len_post) + "/two-groups/neurons_" + str(num_neurons) + "/" + nn_type + "/Attempt " + str(i+1) + "/"
                 Path(path).mkdir(parents=True, exist_ok=True)
                 save_model_name = path + "attempt_" + str(i+1) + "_k-fold_" + str(validation_k+1)
                 actual_epochs = path_nn.runTraining(X_train, y_train, X_validation,
@@ -99,6 +101,9 @@ def train(nn_type):
                 validation_results[validation_k] = round(valid_acc, 5)
                 actual_epochs_results[validation_k] = actual_epochs
 
+            path = "models/" + str(task) + "/K-fold/" + str(max_len_post) + "/two-groups/neurons_" + str(
+                num_neurons) + "/" + nn_type + "/Attempt " + str(i + 1)
+            shutil.rmtree(path)
             result_acc = numpy.mean(validation_results)
             num_epochs = numpy.max(actual_epochs_results)
             training = []
@@ -107,8 +112,8 @@ def train(nn_type):
             X_train, y_train = create_x_y(training, task)
             X_train = pad_sequences(X_train, maxlen=max_len_post, padding='post')
 
-            path = "models/" + str(task) + "/K-fold/" + str(max_len_post) + "/neurons_" + str(
-                num_neurons) + "/" + nn_type + "/Attempt " + str(i + 1) + "/"
+            path = "models/" + str(task) + "/K-fold/" + str(max_len_post) + "/two-groups/neurons_" + str(
+                num_neurons) + "/" + nn_type + "/"
             Path(path).mkdir(parents=True, exist_ok=True)
             save_model_name = path + "attempt_" + str(i + 1)
             actual_epochs = path_nn.runTraining_k_fold(X_train, y_train, embedding_matrix,
@@ -128,7 +133,7 @@ max_len_post = 100
 task = "age"
 topic = "Watches"
 word_embedding_dictionary = "itwac"
-number_of_neurons = [25, 50, 100]
+number_of_neurons = [25]
 k = 5
 batch_size = 500
 early_stopping_wait = 50
@@ -200,7 +205,6 @@ for message_dict in corpus_watches:
 
 for num_neurons in number_of_neurons:
     filePathMainInfo = "results/results_age_k-fold_itwac_max_length_" + str(max_len_post) + "_num_neurons_" + str(num_neurons) + ".txt"
-
     with open(filePathMainInfo, "w") as f:
         num_0 = 0
         num_1 = 0
@@ -223,7 +227,6 @@ for num_neurons in number_of_neurons:
         f.write("Rest of the corpus:\n")
         f.write("\t<30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(corpus_rest))) + "%\n")
         f.write("\t>49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(corpus_rest))) + "%\n")
-
 
     train("Simple LSTM")
     train("LSTM Dropout 1")
