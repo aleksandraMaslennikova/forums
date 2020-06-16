@@ -13,7 +13,7 @@ with open("data/final_users_location.txt", encoding="utf8") as f:
         line = f.readline()
 
 with open("data/final_users_location.txt", encoding="utf8") as f:
-    with open("data/final_users_location_user_id.txt", "w", encoding="utf8") as outWithLocationNoUsername:
+    with open("../data/final_users_location_user_id.txt", "w", encoding="utf8") as outWithLocationNoUsername:
         line = f.readline()
         while line:
             if line.startswith("<doc"):

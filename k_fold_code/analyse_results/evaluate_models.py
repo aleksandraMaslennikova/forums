@@ -152,10 +152,10 @@ def analyzing_predictions(predictions, right_y, filePath, description):
 
 task = "age"
 sub_category = "two-groups"
-max_length = 200
-num_neurons_list = [100]
+max_length = 100
+num_neurons_list = [25, 50, 100]
 topic = "Watches"
-filePath = "results/analysis_" + task + "_k-fold_itwac_max_length_" + str(max_length)
+filePath = "results/analysis_" + task + "_k-fold_itwac_max_length_" + str(max_length) + ".txt"
 
 in_domain, out_domain = load_data(topic, max_length)
 X_in_domain, y_in_domain = create_x_y(in_domain, task)

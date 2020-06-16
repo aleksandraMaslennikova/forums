@@ -105,7 +105,7 @@ def readCorpusPartFromFile(filePath, docMaxLength, user_id_list):
 
 
 def divideCorpusInTrainingValidationTest(max_review_length,word_embedding_dict,training_user_id,validation_user_id,test_user_id):
-    training = readCorpusPartFromFile("data/final_corpus.txt", max_review_length, training_user_id)
+    training = readCorpusPartFromFile("../../data/final_corpus.txt", max_review_length, training_user_id)
     training = readCorpusData.transformTextToWordEmbeddings(training, word_embedding_dict)
     print("Training: " + str(len(training)))
     with open('data/dict/' + str(word_embedding_dict) + '/' + str(max_review_length) + '/final_corpus_training_' + str(
@@ -117,7 +117,7 @@ def divideCorpusInTrainingValidationTest(max_review_length,word_embedding_dict,t
         print("Not deleted")
         pass
 
-    validation = readCorpusPartFromFile("data/final_corpus.txt", max_review_length, validation_user_id)
+    validation = readCorpusPartFromFile("../../data/final_corpus.txt", max_review_length, validation_user_id)
     validation = readCorpusData.transformTextToWordEmbeddings(validation, word_embedding_dict)
     print("Validation: " + str(len(validation)))
     with open(
@@ -130,7 +130,7 @@ def divideCorpusInTrainingValidationTest(max_review_length,word_embedding_dict,t
         print("Not deleted")
         pass
 
-    test = readCorpusPartFromFile("data/final_corpus.txt", max_review_length, test_user_id)
+    test = readCorpusPartFromFile("../../data/final_corpus.txt", max_review_length, test_user_id)
     test = readCorpusData.transformTextToWordEmbeddings(test, word_embedding_dict)
     print("Test: " + str(len(test)))
     with open('data/dict/' + str(word_embedding_dict) + '/' + str(max_review_length) + '/final_corpus_test_' + str(

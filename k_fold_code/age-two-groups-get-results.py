@@ -129,22 +129,23 @@ def train(nn_type):
         f.write("\n")
         f.close()
 
-max_len_post = 100
+
+max_len_post = 1000
 task = "age"
 topic = "Watches"
 word_embedding_dictionary = "itwac"
-number_of_neurons = [25]
+number_of_neurons = [100]
 k = 5
 batch_size = 500
 early_stopping_wait = 50
-repeat = 5
+repeat = 1
 num_categories = 2
 
 if word_embedding_dictionary == "itwac":
-    with open('data/itwac_word_embedding_matrix.pickle', 'rb') as handle:
+    with open('../data/itwac_word_embedding_matrix.pickle', 'rb') as handle:
         embedding_matrix = pickle.load(handle)
 else:
-    with open('data/twitter_word_embedding_matrix.pickle', 'rb') as handle:
+    with open('../data/twitter_word_embedding_matrix.pickle', 'rb') as handle:
         embedding_matrix = pickle.load(handle)
 
 developing_user_id_watches_two_groups = [524, 754, 537, 854, 529, 520, 605, 848, 525, 719, 825, 809, 510, 606, 687, 806,
@@ -205,6 +206,7 @@ for message_dict in corpus_watches:
 
 for num_neurons in number_of_neurons:
     filePathMainInfo = "results/results_age_k-fold_itwac_max_length_" + str(max_len_post) + "_num_neurons_" + str(num_neurons) + ".txt"
+    """
     with open(filePathMainInfo, "w") as f:
         num_0 = 0
         num_1 = 0
@@ -227,12 +229,12 @@ for num_neurons in number_of_neurons:
         f.write("Rest of the corpus:\n")
         f.write("\t<30    : " + str(num_0) + "; percent: " + str(round(num_0 * 100.0 / len(corpus_rest))) + "%\n")
         f.write("\t>49,<70: " + str(num_1) + "; percent: " + str(round(num_1 * 100.0 / len(corpus_rest))) + "%\n")
-
-    train("Simple LSTM")
+    """
+    #train("Simple LSTM")
     train("LSTM Dropout 1")
-    train("LSTM Dropout 2")
-    train("LSTM with CNN")
-    train("Simple BLSTM")
-    train("BLSTM Dropout 1")
-    train("BLSTM Dropout 2")
-    train("BLSTM with CNN")
+    #train("LSTM Dropout 2")
+    #train("LSTM with CNN")
+    #train("Simple BLSTM")
+    #train("BLSTM Dropout 1")
+    #train("BLSTM Dropout 2")
+    #train("BLSTM with CNN")

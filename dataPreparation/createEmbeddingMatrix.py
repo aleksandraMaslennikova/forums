@@ -1,9 +1,9 @@
 import pickle
 
-from keras_preprocessing.sequence import pad_sequences
 from keras_preprocessing.text import Tokenizer
 import numpy
 import readCorpusData
+
 
 def create_embedding_matrix(word_embedding_dictionary, tokenizer):
     embedding_matrix = numpy.zeros((vocab_size, 129))
@@ -22,7 +22,8 @@ def create_embedding_matrix(word_embedding_dictionary, tokenizer):
         num_words += 1
     return embedding_matrix
 
-corpus = readCorpusData.readCorpusFromFile("data/final_corpus.txt", 1000)
+
+corpus = readCorpusData.readCorpusFromFile("../data/final_corpus.txt", 1000)
 docs = []
 for post in corpus:
     docs.append(post["text"])
@@ -35,40 +36,40 @@ encoded_docs = t.texts_to_sequences(docs)
 for i in range(len(corpus)):
     corpus[i]["text_sequence"] = encoded_docs[i]
 
-with open('data/final_corpus_dictionary_max_length_1000.pickle', 'wb') as handle:
+with open('../data/final_corpus_dictionary_max_length_1000.pickle', 'wb') as handle:
     pickle.dump(corpus, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-corpus = readCorpusData.readCorpusFromFile("data/final_corpus.txt", 500)
+corpus = readCorpusData.readCorpusFromFile("../data/final_corpus.txt", 500)
 docs = []
 for post in corpus:
     docs.append(post["text"])
 encoded_docs = t.texts_to_sequences(docs)
 for i in range(len(corpus)):
     corpus[i]["text_sequence"] = encoded_docs[i]
-with open('data/final_corpus_dictionary_max_length_500.pickle', 'wb') as handle:
+with open('../data/final_corpus_dictionary_max_length_500.pickle', 'wb') as handle:
     pickle.dump(corpus, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-corpus = readCorpusData.readCorpusFromFile("data/final_corpus.txt", 200)
+corpus = readCorpusData.readCorpusFromFile("../data/final_corpus.txt", 200)
 docs = []
 for post in corpus:
     docs.append(post["text"])
 encoded_docs = t.texts_to_sequences(docs)
 for i in range(len(corpus)):
     corpus[i]["text_sequence"] = encoded_docs[i]
-with open('data/final_corpus_dictionary_max_length_200.pickle', 'wb') as handle:
+with open('../data/final_corpus_dictionary_max_length_200.pickle', 'wb') as handle:
     pickle.dump(corpus, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-corpus = readCorpusData.readCorpusFromFile("data/final_corpus.txt", 100)
+corpus = readCorpusData.readCorpusFromFile("../data/final_corpus.txt", 100)
 docs = []
 for post in corpus:
     docs.append(post["text"])
 encoded_docs = t.texts_to_sequences(docs)
 for i in range(len(corpus)):
     corpus[i]["text_sequence"] = encoded_docs[i]
-with open('data/final_corpus_dictionary_max_length_100.pickle', 'wb') as handle:
+with open('../data/final_corpus_dictionary_max_length_100.pickle', 'wb') as handle:
     pickle.dump(corpus, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-with open('data/itwac_word_embedding_matrix.pickle', 'wb') as handle:
+with open('../data/itwac_word_embedding_matrix.pickle', 'wb') as handle:
     pickle.dump(create_embedding_matrix("itwac", t), handle, protocol=pickle.HIGHEST_PROTOCOL)
-#with open('data/twitter_word_embedding_matrix.pickle', 'wb') as handle:
-#    pickle.dump(create_embedding_matrix("twitter", t), handle, protocol=pickle.HIGHEST_PROTOCOL)
+with open('../data/twitter_word_embedding_matrix.pickle', 'wb') as handle:
+    pickle.dump(create_embedding_matrix("twitter", t), handle, protocol=pickle.HIGHEST_PROTOCOL)

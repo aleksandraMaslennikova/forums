@@ -1,5 +1,5 @@
 dict_forum_thematic = {}
-with open("data/ForumsWithThematics.csv", encoding="utf8") as f:
+with open("../data/ForumsWithThematics.csv", encoding="utf8") as f:
     line = f.readline()
     while line:
         line_arr = line.split(";")
@@ -8,8 +8,8 @@ with open("data/ForumsWithThematics.csv", encoding="utf8") as f:
         dict_forum_thematic[forum] = thematic
         line = f.readline()
 
-with open("data/final_users_location_user_id.txt", encoding="utf8") as fin:
-    with open("data/final_corpus.txt", "w", encoding="utf8") as fout:
+with open("../data/final_users_location_user_id.txt", encoding="utf8") as fin:
+    with open("../data/final_corpus.txt", "w", encoding="utf8") as fout:
         line = fin.readline()
         while line:
             if line.startswith("<doc"):
