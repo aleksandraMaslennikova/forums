@@ -15,19 +15,6 @@ import blstm.classification.blstm_dropout_2
 import blstm.classification.blstm_with_cnn
 
 
-def transform_gender_category(corpus, topic, reversed):
-    for post in corpus:
-        age = int(post["gender"])
-        forums_thematic = post["forums_thematic"]
-        if reversed:
-            if forums_thematic == topic:
-                post["age"] = "to_del"
-        else:
-            if forums_thematic == topic:
-                post["age"] = "to_del"
-    return corpus
-
-
 def create_x_y(corpus, task):
     x = []
     y = []
@@ -171,7 +158,12 @@ for i in range(k):
 # load data for topic
 with open('../data/final_corpus_dictionary_max_length_' + str(max_len_post) + '.pickle', 'rb') as handle:
     corpus_watches = pickle.load(handle)
-corpus_watches = transform_gender_category(corpus_watches, topic, False)
+
+for post in corpus_watches:
+    forums_thematic = post["forums_thematic"]
+    if forums_thematic != topic:
+         post[task] = "to_del"
+
 posts_id_to_del = []
 for i in range(len(corpus_watches)):
     if corpus_watches[i][task] == "to_del":
