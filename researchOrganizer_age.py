@@ -77,7 +77,7 @@ def resultsOfTest(X_test, y_test, save_model_name):
     return result_str
 
 # main variables notation
-max_review_length = 200
+max_review_length = 100
 word_embedding_dict = "twitter"
 task = "age"
 topic = "Watches"
@@ -325,7 +325,7 @@ if word_embedding_dict == "itwac":
 else:
     with open('data/twitter_word_embedding_matrix.pickle', 'rb') as handle:
         embedding_matrix = pickle.load(handle)
-
+"""
 with open(filePathMainInfoTrain, "w") as f:
     if topic == "Watches" and num_categories == 2:
         num_0 = 0
@@ -509,7 +509,8 @@ with open(filePathMainInfoTrain, "a") as f:
             f.flush()
     f.write("\n")
     f.close()
-
+"""
+numNeurons = [50, 100, 129]
 with open(filePathMainInfoTrain, "a") as f:
     f.write("\nBLSTM with CNN\n")
     for n in numNeurons:
