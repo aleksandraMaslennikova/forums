@@ -79,7 +79,7 @@ def run_train_one_k_fold(filePathMainInfo, task, max_len_post, num_neurons, nn_t
 
 
 def run_train_final(filePathMainInfo, task, max_len_post, num_neurons, nn_type,
-                    X_train, y_train, embedding_matrix, num_categories, batch_size,
+                    X_train, y_train, embedding_matrix, num_categories, batch_size, attempt_i,
                     result_acc, num_epochs):
     path_nn = None
     if nn_type == "Simple LSTM":
@@ -101,7 +101,7 @@ def run_train_final(filePathMainInfo, task, max_len_post, num_neurons, nn_type,
     path = "../models/" + str(task) + "/K-fold/" + str(max_len_post) + "/neurons_" + str(
         num_neurons) + "/" + nn_type + "/"
     Path(path).mkdir(parents=True, exist_ok=True)
-    save_model_name = path + "attempt_" + str(i + 1)
+    save_model_name = path + "attempt_" + str(attempt_i + 1)
     actual_epochs = path_nn.runTraining_k_fold(X_train, y_train, embedding_matrix,
                                                num_neurons, num_categories, batch_size,
                                                num_epochs, save_model_name)
@@ -147,9 +147,9 @@ def train(nn_type):
             training += posts_k_fold[j]
         X_train, y_train = create_x_y(training, task)
         X_train = pad_sequences(X_train, maxlen=max_len_post, padding='post')
-
+        print("FINAL TRAIN")
         p = Process(target=run_train_final, args=(filePathMainInfo, task, max_len_post, num_neurons, nn_type,
-                    X_train, y_train, embedding_matrix, num_categories, batch_size,
+                    X_train, y_train, embedding_matrix, num_categories, batch_size, i,
                     result_acc, num_epochs,))
         p.start()
         p.join()
