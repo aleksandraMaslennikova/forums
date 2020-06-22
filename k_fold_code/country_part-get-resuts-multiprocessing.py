@@ -141,7 +141,7 @@ def train(nn_type):
             num_neurons) + "/" + nn_type + "/Attempt " + str(i + 1)
         shutil.rmtree(path)
         result_acc = numpy.mean(validation_results[:])
-        num_epochs = numpy.max(actual_epochs_results[:])
+        num_epochs = actual_epochs_results[:][validation_results[:].index(max(validation_results[:]))]
         training = []
         for j in range(k):
             training += posts_k_fold[j]

@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy
 from keras.engine.saving import load_model
 from keras_preprocessing.sequence import pad_sequences
+from multiprocessing import Process
 
 import lstm.classification.lstm_simple
 import lstm.classification.lstm_dropout_1
@@ -24,7 +25,21 @@ def create_x_y(corpus, task):
     return numpy.array(x), numpy.array(y)
 
 
-def train(nn_type):
+def f(name):
+    print('hello', name)
+
+
+def output_in_file(filePathMainInfo, writeType, text):
+    with open(filePathMainInfo, writeType) as f:
+        f.write(text)
+        f.flush()
+        f.close()
+
+
+def run_train_one_k_fold(filePathMainInfo, task, max_len_post, num_neurons, nn_type, attempt_i, validation_k,
+                         X_train, y_train, X_validation, y_validation,
+                         embedding_matrix, num_categories, batch_size,early_stopping_wait,
+                         validation_results, actual_epochs_results):
     path_nn = None
     if nn_type == "Simple LSTM":
         path_nn = lstm.classification.lstm_simple
@@ -42,83 +57,100 @@ def train(nn_type):
         path_nn = blstm.classification.blstm_dropout_2
     elif nn_type == "BLSTM with CNN":
         path_nn = blstm.classification.blstm_with_cnn
-    with open(filePathMainInfo, "a") as f:
-        f.write("\n" + nn_type + "\n")
-        for i in range(repeat):
-            f.write("\tAttempt " + str(i+1) + "\n")
-            validation_results = [0] * k
-            actual_epochs_results = [0] * k
-            for validation_k in range(k):
-                training = []
-                validation = []
-                for j in range(k):
-                    if j == validation_k:
-                        validation += posts_k_fold[j]
-                    else:
-                        training += posts_k_fold[j]
-                X_train, y_train = create_x_y(training, task)
-                X_train = pad_sequences(X_train, maxlen=max_len_post, padding='post')
-                X_validation, y_validation = create_x_y(validation, task)
-                X_validation = pad_sequences(X_validation, maxlen=max_len_post, padding='post')
+    path = "../models/" + str(task) + "/K-fold/" + str(max_len_post) + "/neurons_" + str(num_neurons) + "/" + nn_type + "/Attempt " + str(attempt_i + 1) + "/"
+    Path(path).mkdir(parents=True, exist_ok=True)
+    save_model_name = path + "attempt_" + str(attempt_i + 1) + "_k-fold_" + str(validation_k + 1)
 
-                path = "../models/" + str(task) + "/K-fold/" + str(max_len_post) + "/neurons_" + str(num_neurons) + "/" + nn_type + "/Attempt " + str(i+1) + "/"
-                Path(path).mkdir(parents=True, exist_ok=True)
-                save_model_name = path + "attempt_" + str(i+1) + "_k-fold_" + str(validation_k+1)
-                actual_epochs = path_nn.runTraining(X_train, y_train, X_validation,
-                                                                            y_validation, embedding_matrix, num_neurons,
-                                                                            num_categories, batch_size,
-                                                                            early_stopping_wait, save_model_name)
-                saved_model = load_model(save_model_name)
-                _, train_acc = saved_model.evaluate(X_train, y_train, verbose=0)
-                _, valid_acc = saved_model.evaluate(X_validation, y_validation, verbose=0)
-                result_str = '\t\tK-Fold ' + str(validation_k + 1) + ", Epochs " + str(actual_epochs) + "\t\t\t"
-                result_str += 'Train: %.3f%%, Validation: %.3f%%' % (train_acc * 100, valid_acc * 100)
-                result_str += '\n'
-                f.write(result_str)
-                f.flush()
+    actual_epochs = path_nn.runTraining(X_train, y_train, X_validation,
+                                        y_validation, embedding_matrix, num_neurons,
+                                        num_categories, batch_size,
+                                        early_stopping_wait, save_model_name)
 
-                validation_results[validation_k] = round(valid_acc, 5)
-                actual_epochs_results[validation_k] = actual_epochs
+    saved_model = load_model(save_model_name)
+    _, train_acc = saved_model.evaluate(X_train, y_train, verbose=0)
+    _, valid_acc = saved_model.evaluate(X_validation, y_validation, verbose=0)
+    result_str = '\t\tK-Fold ' + str(validation_k + 1) + ", Epochs " + str(actual_epochs) + "\t\t\t"
+    result_str += 'Train: %.3f%%, Validation: %.3f%%' % (train_acc * 100, valid_acc * 100)
+    result_str += '\n'
+    output_in_file(filePathMainInfo, "a", result_str)
 
-            path = "../models/" + str(task) + "/K-fold/" + str(max_len_post) + "/neurons_" + str(
-                num_neurons) + "/" + nn_type + "/Attempt " + str(i + 1)
-            shutil.rmtree(path)
-            result_acc = numpy.mean(validation_results)
-            num_epochs = numpy.max(actual_epochs_results)
+    validation_results[validation_k] = round(valid_acc, 5)
+    actual_epochs_results[validation_k] = actual_epochs
+
+
+def train(nn_type):
+    output_in_file(filePathMainInfo, "a", "\n" + nn_type + "\n")
+    for i in range(repeat):
+        output_in_file(filePathMainInfo, "a", "\tAttempt " + str(i+1) + "\n")
+
+        validation_results = [0] * k
+        actual_epochs_results = [0] * k
+        for validation_k in range(k):
             training = []
+            validation = []
             for j in range(k):
-                training += posts_k_fold[j]
+                if j == validation_k:
+                    validation += posts_k_fold[j]
+                else:
+                    training += posts_k_fold[j]
             X_train, y_train = create_x_y(training, task)
             X_train = pad_sequences(X_train, maxlen=max_len_post, padding='post')
+            X_validation, y_validation = create_x_y(validation, task)
+            X_validation = pad_sequences(X_validation, maxlen=max_len_post, padding='post')
 
-            path = "../models/" + str(task) + "/K-fold/" + str(max_len_post) + "/neurons_" + str(
-                num_neurons) + "/" + nn_type + "/"
-            Path(path).mkdir(parents=True, exist_ok=True)
-            save_model_name = path + "attempt_" + str(i + 1)
-            actual_epochs = path_nn.runTraining_k_fold(X_train, y_train, embedding_matrix,
-                                                                               num_neurons, num_categories, batch_size,
-                                                                               num_epochs, save_model_name)
-            saved_model = load_model(save_model_name)
-            _, train_acc = saved_model.evaluate(X_train, y_train, verbose=0)
-            result_str = '\t\tRESULTS ' + str(validation_k + 1) + ", Epochs " + str(num_epochs) + "\t\t\t"
-            result_str += 'Train: %.3f%%, Validation: %.3f%%' % (train_acc * 100, result_acc * 100)
-            result_str += '\n'
-            f.write(result_str)
-            f.flush()
-        f.write("\n")
-        f.close()
+            if __name__ == '__main__':
+                p = Process(target=run_train_one_k_fold, args=(filePathMainInfo, task, max_len_post, num_neurons, nn_type, i, validation_k, X_train, y_train, X_validation, y_validation, embedding_matrix, num_categories, batch_size,early_stopping_wait, validation_results, actual_epochs_results,))
+                #p = Process(target=f, args=("bib",))
+                p.start()
+                p.join()
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print(validation_results)
+        print(actual_epochs_results)
+        """
+        path = "../models/" + str(task) + "/K-fold/" + str(max_len_post) + "/neurons_" + str(
+            num_neurons) + "/" + nn_type + "/Attempt " + str(i + 1)
+        #shutil.rmtree(path)
+        result_acc = numpy.mean(validation_results)
+        num_epochs = numpy.max(actual_epochs_results)
+        training = []
+        for j in range(k):
+            training += posts_k_fold[j]
+        X_train, y_train = create_x_y(training, task)
+        X_train = pad_sequences(X_train, maxlen=max_len_post, padding='post')
+        """
+        """
+        path = "../models/" + str(task) + "/K-fold/" + str(max_len_post) + "/neurons_" + str(
+            num_neurons) + "/" + nn_type + "/"
+        Path(path).mkdir(parents=True, exist_ok=True)
+        save_model_name = path + "attempt_" + str(i + 1)
+        actual_epochs = path_nn.runTraining_k_fold(X_train, y_train, embedding_matrix,
+                                                                           num_neurons, num_categories, batch_size,
+                                                                           num_epochs, save_model_name)
+        saved_model = load_model(save_model_name)
+        _, train_acc = saved_model.evaluate(X_train, y_train, verbose=0)
+        result_str = '\t\tRESULTS ' + str(validation_k + 1) + ", Epochs " + str(num_epochs) + "\t\t\t"
+        result_str += 'Train: %.3f%%, Validation: %.3f%%' % (train_acc * 100, result_acc * 100)
+        result_str += '\n'
+        output_in_file(filePathMainInfo, "a", result_str + "\n")
+        """
 
 
-max_len_post = 500
+max_len_post = 1000
 task = "country_part"
 topic = "Watches"
 word_embedding_dictionary = "itwac"
-number_of_neurons = [25, 50, 100]
+number_of_neurons = [100]
 k = 5
-batch_size = 500
-early_stopping_wait = 50
+batch_size = 250
+early_stopping_wait = 2
 repeat = 5
 num_categories = 5
+
+if __name__ == '__main__':
+    name = 'bib'
+    p = Process(target=f, args=(name,))
+    p.start()
+    p.join()
 
 if word_embedding_dictionary == "itwac":
     with open('../data/itwac_word_embedding_matrix.pickle', 'rb') as handle:
@@ -187,33 +219,33 @@ for message_dict in corpus_watches:
 for num_neurons in number_of_neurons:
     filePathMainInfo = "../results/results_" + task + "_k-fold_itwac_max_length_" + str(max_len_post) + "_num_neurons_" + str(num_neurons) + ".txt"
 
-    with open(filePathMainInfo, "w") as f:
-        task_options_list = []
-        for message_dict in corpus_watches:
-            option = message_dict[task]
-            if type(option) is list:
-                option = option.index(1)
-            task_options_list.append(option)
-        task_options_list = list(set(task_options_list))
+    task_options_list = []
+    for message_dict in corpus_watches:
+        option = message_dict[task]
+        if type(option) is list:
+            option = option.index(1)
+        task_options_list.append(option)
+    task_options_list = list(set(task_options_list))
 
-        dict = {}
-        for option in task_options_list:
-            dict[option] = 0
-        for post in corpus_watches:
-            option = post[task]
-            if type(option) is list:
-                option = option.index(1)
-            dict[option] += 1
+    dict = {}
+    for option in task_options_list:
+        dict[option] = 0
+    for post in corpus_watches:
+        option = post[task]
+        if type(option) is list:
+            option = option.index(1)
+        dict[option] += 1
 
-        f.write(topic + ":\n")
-        for option in task_options_list:
-            f.write("\t" + str(option) + ": " + str(dict[option]) + "; percent: " + str(round(dict[option] * 100.0 / len(corpus_watches))) + "%\n")
+    text = topic + ":\n"
+    for option in task_options_list:
+        text += ("\t" + str(option) + ": " + str(dict[option]) + "; percent: " + str(round(dict[option] * 100.0 / len(corpus_watches))) + "%\n")
+    #output_in_file(filePathMainInfo, "w", text)
 
     train("Simple LSTM")
-    train("LSTM Dropout 1")
-    train("LSTM Dropout 2")
-    train("LSTM with CNN")
-    train("Simple BLSTM")
-    train("BLSTM Dropout 1")
-    train("BLSTM Dropout 2")
-    train("BLSTM with CNN")
+    #train("LSTM Dropout 1")
+    #train("LSTM Dropout 2")
+    #train("LSTM with CNN")
+    #train("Simple BLSTM")
+    #train("BLSTM Dropout 1")
+    #train("BLSTM Dropout 2")
+    #train("BLSTM with CNN")
