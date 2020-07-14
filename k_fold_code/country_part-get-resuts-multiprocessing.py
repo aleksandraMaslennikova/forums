@@ -141,7 +141,7 @@ def train(nn_type):
             num_neurons) + "/" + nn_type + "/Attempt " + str(i + 1)
         shutil.rmtree(path)
         result_acc = numpy.mean(validation_results[:])
-        num_epochs = actual_epochs_results[:][validation_results[:].index(max(validation_results[:]))]
+        num_epochs = actual_epochs_results[:][validation_results[:].index(max(validation_results[:]))] + 1
         training = []
         for j in range(k):
             training += posts_k_fold[j]
@@ -157,11 +157,11 @@ def train(nn_type):
 
 
 if __name__ == '__main__':
-    max_len_post = 1000
+    max_len_post = 500
     task = "country_part"
     topic = "Watches"
     word_embedding_dictionary = "itwac"
-    number_of_neurons = [100]
+    number_of_neurons = [25]
     k = 5
     batch_size = 250
     early_stopping_wait = 50
@@ -260,7 +260,7 @@ if __name__ == '__main__':
         train("LSTM Dropout 1")
         train("LSTM Dropout 2")
         train("LSTM with CNN")
-        #train("Simple BLSTM")
-        #train("BLSTM Dropout 1")
-        #train("BLSTM Dropout 2")
-        #train("BLSTM with CNN")
+        train("Simple BLSTM")
+        train("BLSTM Dropout 1")
+        train("BLSTM Dropout 2")
+        train("BLSTM with CNN")
