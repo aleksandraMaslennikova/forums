@@ -2,8 +2,8 @@ import re
 import numpy as np
 
 max_length = 1000
-num_neurons = 50
-task = "age"
+num_neurons = 100
+task = "country_part"
 word_embedding = "itwac"
 fileName = "results_" + task + "_k-fold_" + word_embedding + "_max_length_" + str(max_length) + "_num_neurons_" + str(num_neurons) + ".txt"
 path = "../../results/"

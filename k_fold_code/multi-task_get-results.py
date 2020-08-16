@@ -125,7 +125,7 @@ def run_train_final(nn_type, filePathMainInfo, task, max_len_post, num_neurons,
         path_nn = multitaskLearning.blstm_dropout_2_multitask
     elif nn_type == "BLSTM with CNN":
         path_nn = multitaskLearning.blstm_with_cnn_multitask
-    path = "../models/" + str(task) + "/K-fold/" + str(max_len_post) + "/neurons_" + str(max_len_post) + "/" + str(nn_type) + "/"
+    path = "../models/" + str(task) + "/K-fold/" + str(max_len_post) + "/neurons_" + str(num_neurons) + "/" + str(nn_type) + "/"
     Path(path).mkdir(parents=True, exist_ok=True)
     save_model_name = path + "attempt_" + str(attempt_i + 1)
     actual_epochs = path_nn.runTraining_k_fold(X_train, y_train, embedding_matrix, num_neurons, batch_size,
@@ -140,7 +140,7 @@ def run_train_final(nn_type, filePathMainInfo, task, max_len_post, num_neurons,
 
 
 def train(nn_type, num_neurons):
-    output_in_file(filePathMainInfo, "a", "\n" + "Multi-task" + "\n")
+    output_in_file(filePathMainInfo, "a", "\n" + nn_type + "\n")
     for i in range(repeat):
         output_in_file(filePathMainInfo, "a", "\tAttempt " + str(i+1) + "\n")
 
@@ -219,10 +219,10 @@ if __name__ == '__main__':
     task = "multi-task"
     topic = "Watches"
     word_embedding_dictionary = "itwac"
-    number_of_neurons = [25]
+    number_of_neurons = [100]
     k = 5
-    batch_size = 250
-    early_stopping_wait = 50
+    batch_size = 100
+    early_stopping_wait = 20
     repeat = 5
 
     if word_embedding_dictionary == "itwac":
@@ -273,13 +273,20 @@ if __name__ == '__main__':
                 else:
                     posts_k_fold[i].append(message_dict)
 
-    for num_neurons in number_of_neurons:
-        filePathMainInfo = "../results/results_" + task + "_k-fold_itwac_max_length_" + str(max_len_post) + "_num_neurons_" + str(num_neurons) + ".txt"
-        train("Simple LSTM", num_neurons)
-        train("LSTM Dropout 1", num_neurons)
-        train("LSTM Dropout 2", num_neurons)
-        train("LSTM with CNN", num_neurons)
-        train("Simple BLSTM", num_neurons)
-        train("BLSTM Dropout 1", num_neurons)
-        train("BLSTM Dropout 2", num_neurons)
-        train("BLSTM with CNN", num_neurons)
+    #for num_neurons in number_of_neurons:
+        #filePathMainInfo = "../results/results_" + task + "_k-fold_itwac_max_length_" + str(max_len_post) + "_num_neurons_" + str(num_neurons) + ".txt"
+        #train("Simple LSTM", num_neurons)
+        #train("LSTM Dropout 1", num_neurons)
+        #train("LSTM Dropout 2", num_neurons)
+        #train("LSTM with CNN", num_neurons)
+        #train("Simple BLSTM", num_neurons)
+        #train("BLSTM Dropout 1", num_neurons)
+        #repeat = 3
+        #train("BLSTM Dropout 2", num_neurons)
+        #repeat = 5
+        #train("BLSTM with CNN", num_neurons)
+    num_neurons = 100
+    filePathMainInfo = "../results/results_" + task + "_k-fold_itwac_max_length_" + str(
+        max_len_post) + "_num_neurons_" + str(num_neurons) + ".txt"
+    train("LSTM Dropout 1", num_neurons)
+    train("LSTM Dropout 2", num_neurons)

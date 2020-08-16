@@ -38,7 +38,7 @@ def create_x_y(corpus, task):
 
 def load_data(topic, max_len_post):
     # load data for topic
-    with open('data/final_corpus_dictionary_max_length_' + str(max_len_post) + '.pickle', 'rb') as handle:
+    with open('../../data/final_corpus_dictionary_max_length_' + str(max_len_post) + '.pickle', 'rb') as handle:
         corpus_topic = pickle.load(handle)
     corpus_topic = transform_age_category(corpus_topic, topic, False)
     posts_id_to_del = []
@@ -61,7 +61,7 @@ def load_data(topic, max_len_post):
             in_domain.append(message_dict)
 
     # load data for the rest of the corpus
-    with open('data/final_corpus_dictionary_max_length_' + str(max_len_post) + '.pickle', 'rb') as handle:
+    with open('../../data/final_corpus_dictionary_max_length_' + str(max_len_post) + '.pickle', 'rb') as handle:
         out_domain = pickle.load(handle)
     out_domain = transform_age_category(out_domain, topic, True)
     posts_id_to_del = []
@@ -152,10 +152,10 @@ def analyzing_predictions(predictions, right_y, filePath, description):
 
 task = "age"
 sub_category = "two-groups"
-max_length = 100
+max_length = 500
 num_neurons_list = [25, 50, 100]
 topic = "Watches"
-filePath = "results/analysis_" + task + "_k-fold_itwac_max_length_" + str(max_length) + ".txt"
+filePath = "../../results/analysis_" + task + "_k-fold_itwac_max_length_" + str(max_length) + ".txt"
 
 in_domain, out_domain = load_data(topic, max_length)
 X_in_domain, y_in_domain = create_x_y(in_domain, task)
@@ -191,7 +191,7 @@ for num_neurons in num_neurons_list:
     with open(filePath, "a") as f:
         f.write("\nNumber of neurons " + str(num_neurons) + "\n")
 
-    path = "models/" + task + "/K-fold/" + str(max_length) + "/" + sub_category + "/" + "neurons_" + str(
+    path = "../../models/" + task + "/K-fold/" + str(max_length) + "/" + sub_category + "/" + "neurons_" + str(
             num_neurons) + "/"
     list_models = os.listdir(path)
     for model in list_models:
